@@ -12,6 +12,7 @@ import {
   View,
 } from "react-native";
 import { colors } from "../constants/colors";
+import { auth } from "../utils/auth";
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get("window");
 
@@ -73,9 +74,19 @@ export default function OnBoarding() {
     handleFinish();
   };
 
-  const handleFinish = () => {
-    // Navigate to main app screen
-    router.replace("/Home");
+  const handleFinish = async () => {
+    // Mark onboarding as completed
+    await auth.setOnboardingCompleted();
+
+    // Check if user is logged in
+    const isLoggedIn = await auth.isLoggedIn();
+
+    // Navigate to signin if not logged in, otherwise go to home
+    if (isLoggedIn) {
+      router.replace("/Home");
+    } else {
+      router.replace("/(auth)/signin");
+    }
   };
 
   return (

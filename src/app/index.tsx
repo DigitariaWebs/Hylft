@@ -1,15 +1,45 @@
-import { Text, View } from "react-native";
+import { useRouter } from "expo-router";
+import { useState } from "react";
+import SplashScreen from "../ui/SplashScreen";
+import { auth } from "../utils/auth";
 
 export default function Index() {
-  return (
-    <View
-      style={{
-        flex: 1,
-        justifyContent: "center",
-        alignItems: "center",
-      }}
-    >
-      <Text>Edit app/index.tsx to edit this screen.</Text>
-    </View>
-  );
+  const router = useRouter();
+  const [showSplash, setShowSplash] = useState(true);
+
+  const handleSplashComplete = async () => {
+    // Hide splash screen
+    setShowSplash(false);
+
+    try {
+      // Check if user has completed onboarding
+      const hasSeenOnboarding = await auth.hasCompletedOnboarding();
+
+      // Check if user is logged in
+      const isLoggedIn = await auth.isLoggedIn();
+
+      // Navigation logic:
+      // 1. If not seen onboarding -> go to onboarding
+      // 2. If seen onboarding but not logged in -> go to signin
+      // 3. If logged in -> go to home
+      if (!hasSeenOnboarding) {
+        router.replace("/OnBoarding");
+      } else if (!isLoggedIn) {
+        router.replace("/(auth)/signin");
+      } else {
+        router.replace("/Home");
+      }
+    } catch (error) {
+      console.error("Error checking auth status:", error);
+      // Default to onboarding on error
+      router.replace("/OnBoarding");
+    }
+  };
+
+  if (showSplash) {
+    return <SplashScreen onAnimationComplete={handleSplashComplete} />;
+  }
+
+  // This will briefly show while navigating
+  return null;
 }
