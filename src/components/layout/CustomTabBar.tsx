@@ -25,8 +25,6 @@ export function CustomTabBar({
 }: BottomTabBarProps) {
   const insets = useSafeAreaInsets();
   const { theme } = useTheme();
-  const [containerWidth, setContainerWidth] = React.useState(0);
-  const tabWidth = containerWidth / state.routes.length;
 
   const styles = createStyles(theme);
 
@@ -38,18 +36,9 @@ export function CustomTabBar({
           paddingBottom: Platform.OS === "ios" ? insets.bottom : 12,
         },
       ]}
-      onLayout={(e) => setContainerWidth(e.nativeEvent.layout.width)}
     >
       {/* Tab Buttons */}
       {state.routes.map((route, index) => {
-        const { options } = descriptors[route.key];
-        const label =
-          options.tabBarLabel !== undefined
-            ? options.tabBarLabel
-            : options.title !== undefined
-              ? options.title
-              : route.name;
-
         const isFocused = state.index === index;
         const iconConfig = ICON_MAP[route.name.toLowerCase()];
 
@@ -114,7 +103,7 @@ function TabButton({
       damping: 420,
       stiffness: 950,
     });
-  }, [isFocused]);
+  }, [isFocused, scale, translateY]);
 
   const animatedIconStyle = useAnimatedStyle(() => ({
     transform: [{ scale: scale.value }, { translateY: translateY.value }],

@@ -14,7 +14,6 @@ const THEME_STORAGE_KEY = "@hylift_theme";
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [themeType, setThemeType] = useState<ThemeType>("male"); // Default to male
-  const [isLoaded, setIsLoaded] = useState(false);
 
   // Load theme from storage on mount
   useEffect(() => {
@@ -29,8 +28,6 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
         }
       } catch (error) {
         console.error("Error loading theme:", error);
-      } finally {
-        setIsLoaded(true);
       }
     };
 

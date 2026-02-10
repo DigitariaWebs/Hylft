@@ -84,7 +84,7 @@ export default function GenderSelection() {
   return (
     <View style={styles.container}>
       <View style={styles.content}>
-        <Text style={styles.title}>What's your birth gender?</Text>
+        <Text style={styles.title}>What&apos;s your birth gender?</Text>
         <Text style={styles.subtitle}>
           This helps us provide personalized recommendations
         </Text>

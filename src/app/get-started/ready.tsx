@@ -29,9 +29,9 @@ export default function Ready() {
           />
         </View>
 
-        <Text style={styles.title}>You're Ready!</Text>
+        <Text style={styles.title}>You&apos;re Ready!</Text>
         <Text style={styles.subtitle}>
-          Let's start your fitness journey together
+          Let&apos;s start your fitness journey together
         </Text>
       </View>
     </View>

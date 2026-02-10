@@ -7,7 +7,9 @@
     "android": "bun expo start --android",
     "ios": "bun expo start --ios",
     "web": "bun expo start --web",
-    "install": "bun expo install"
+    "install": "bun expo install",
+    "lint": "eslint .",
+    "build": "bun expo export --platform android"
   },
   "dependencies": {
     "@expo/vector-icons": "^15.0.3",
