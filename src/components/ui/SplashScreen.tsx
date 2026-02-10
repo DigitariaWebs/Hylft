@@ -59,7 +59,7 @@ export default function SplashScreen({
         ]}
       >
         <Image
-          source={require("../../assets/images/Logo.png")}
+          source={require("../../../assets/images/Logo.png")}
           style={styles.logo}
           resizeMode="contain"
         />

@@ -1,6 +1,6 @@
 import { useRouter } from "expo-router";
 import { useState } from "react";
-import SplashScreen from "../ui/SplashScreen";
+import SplashScreen from "../components/ui/SplashScreen";
 import { auth } from "../utils/auth";
 
 export default function Index() {
@@ -27,7 +27,7 @@ export default function Index() {
       } else if (!isLoggedIn) {
         router.navigate("/auth");
       } else {
-        router.navigate("/home");
+        router.replace("/(tabs)/home");
       }
     } catch (error) {
       console.error("Error checking auth status:", error);

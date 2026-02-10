@@ -41,7 +41,7 @@ const Post = memo(
           </View>
           <TouchableOpacity style={styles.moreButton}>
             <Ionicons
-              name="ellipsis-horizontal"
+              name="ellipsis-vertical"
               size={20}
               color={colors.foreground.white}
             />

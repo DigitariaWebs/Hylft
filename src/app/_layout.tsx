@@ -13,7 +13,7 @@ export default function RootLayout() {
         >
           <Stack.Screen name="index" />
           <Stack.Screen name="OnBoarding" />
-          <Stack.Screen name="home" />
+          <Stack.Screen name="(tabs)" />
         </Stack>
       </SafeAreaView>
     </SafeAreaProvider>

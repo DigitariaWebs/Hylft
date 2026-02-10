@@ -1,0 +1,168 @@
+import { Ionicons } from "@expo/vector-icons";
+import { BottomTabBarProps } from "@react-navigation/bottom-tabs";
+import React from "react";
+import { Platform, StyleSheet, TouchableOpacity, View } from "react-native";
+import Animated, {
+  useAnimatedStyle,
+  useSharedValue,
+  withSpring,
+} from "react-native-reanimated";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { colors } from "../../constants/colors";
+
+type IconName = keyof typeof Ionicons.glyphMap;
+
+const ICON_MAP: Record<string, { default: IconName; focused: IconName }> = {
+  home: { default: "home-outline", focused: "home" },
+  workout: { default: "barbell-outline", focused: "barbell" },
+  profile: { default: "person-outline", focused: "person" },
+};
+
+export function CustomTabBar({
+  state,
+  descriptors,
+  navigation,
+}: BottomTabBarProps) {
+  const insets = useSafeAreaInsets();
+  const [containerWidth, setContainerWidth] = React.useState(0);
+  const tabWidth = containerWidth / state.routes.length;
+
+  return (
+    <View
+      style={[
+        styles.container,
+        {
+          paddingBottom: Platform.OS === "ios" ? insets.bottom : 12,
+        },
+      ]}
+      onLayout={(e) => setContainerWidth(e.nativeEvent.layout.width)}
+    >
+      {/* Tab Buttons */}
+      {state.routes.map((route, index) => {
+        const { options } = descriptors[route.key];
+        const label =
+          options.tabBarLabel !== undefined
+            ? options.tabBarLabel
+            : options.title !== undefined
+              ? options.title
+              : route.name;
+
+        const isFocused = state.index === index;
+        const iconConfig = ICON_MAP[route.name.toLowerCase()];
+
+        const onPress = () => {
+          const event = navigation.emit({
+            type: "tabPress",
+            target: route.key,
+            canPreventDefault: true,
+          });
+
+          if (!isFocused && !event.defaultPrevented) {
+            navigation.navigate(route.name, route.params);
+          }
+        };
+
+        const onLongPress = () => {
+          navigation.emit({
+            type: "tabLongPress",
+            target: route.key,
+          });
+        };
+
+        return (
+          <TabButton
+            key={route.key}
+            isFocused={isFocused}
+            iconName={isFocused ? iconConfig.focused : iconConfig.default}
+            onPress={onPress}
+            onLongPress={onLongPress}
+          />
+        );
+      })}
+    </View>
+  );
+}
+
+interface TabButtonProps {
+  isFocused: boolean;
+  iconName: IconName;
+  onPress: () => void;
+  onLongPress: () => void;
+}
+
+function TabButton({
+  isFocused,
+  iconName,
+  onPress,
+  onLongPress,
+}: TabButtonProps) {
+  const scale = useSharedValue(1);
+  const translateY = useSharedValue(0);
+
+  React.useEffect(() => {
+    scale.value = withSpring(isFocused ? 1.1 : 1, {
+      damping: 420,
+      stiffness: 950,
+    });
+    translateY.value = withSpring(isFocused ? -2 : 0, {
+      damping: 420,
+      stiffness: 950,
+    });
+  }, [isFocused]);
+
+  const animatedIconStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: scale.value }, { translateY: translateY.value }],
+  }));
+
+  return (
+    <TouchableOpacity
+      accessibilityRole="button"
+      accessibilityState={isFocused ? { selected: true } : {}}
+      onPress={onPress}
+      onLongPress={onLongPress}
+      style={styles.tabButton}
+      activeOpacity={0.7}
+    >
+      <Animated.View style={[styles.iconContainer, animatedIconStyle]}>
+        <Ionicons
+          name={iconName}
+          size={24}
+          color={isFocused ? colors.primary.main : colors.foreground.gray}
+        />
+      </Animated.View>
+    </TouchableOpacity>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    position: "absolute",
+    bottom: 16,
+    left: 16,
+    right: 16,
+    flexDirection: "row",
+    backgroundColor: colors.background.darker,
+    borderTopWidth: 1,
+    borderTopColor: colors.background.accent,
+    borderRadius: 24,
+    overflow: "hidden",
+    paddingTop: 8,
+    zIndex: 50,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: -2,
+    },
+    shadowOpacity: 0.35,
+    shadowRadius: 8,
+  },
+  tabButton: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: 2,
+  },
+  iconContainer: {
+    marginBottom: 0,
+  },
+});

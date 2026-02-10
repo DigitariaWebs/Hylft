@@ -156,6 +156,7 @@ export default function Home() {
         renderItem={renderPost}
         keyExtractor={(item) => item.id}
         showsVerticalScrollIndicator={false}
+        contentContainerStyle={{ paddingBottom: 70 }}
         refreshControl={
           <RefreshControl
             refreshing={refreshing}
@@ -180,7 +181,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingHorizontal: 16,
     paddingVertical: 12,
-    borderBottomWidth: 0,
+    borderBottomWidth: 1,
     borderBottomColor: colors.background.darker,
   },
   logo: {
