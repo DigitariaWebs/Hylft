@@ -27,7 +27,7 @@ export default function Index() {
       } else if (!isLoggedIn) {
         router.navigate("/auth");
       } else {
-        router.navigate("/Home");
+        router.navigate("/home");
       }
     } catch (error) {
       console.error("Error checking auth status:", error);

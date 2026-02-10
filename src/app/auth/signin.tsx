@@ -35,7 +35,7 @@ export default function SignIn() {
 
       setIsLoading(false);
       // Navigate to home after successful login
-      router.navigate("/Home");
+      router.navigate("/home");
     }, 1500);
   };
 

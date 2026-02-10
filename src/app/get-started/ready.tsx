@@ -9,8 +9,8 @@ export default function Ready() {
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      router.navigate("/Home");
-    }, 2000);
+      router.navigate("/home");
+    }, 1500);
 
     return () => clearTimeout(timer);
   }, [router]);

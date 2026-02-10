@@ -83,7 +83,7 @@ export default function OnBoarding() {
 
     // Navigate to auth landing if not logged in, otherwise go to home
     if (isLoggedIn) {
-      router.navigate("/Home");
+      router.navigate("/home");
     } else {
       router.navigate("/auth");
     }
