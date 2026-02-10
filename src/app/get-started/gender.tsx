@@ -1,17 +1,85 @@
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import { colors } from "../../constants/colors";
+import { Theme } from "../../constants/themes";
+import { useTheme } from "../../contexts/ThemeContext";
+
+function createStyles(theme: Theme) {
+  return StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: theme.background.dark,
+      paddingHorizontal: 32,
+      paddingBottom: 20,
+    },
+    content: {
+      flex: 1,
+    },
+    title: {
+      fontSize: 32,
+      fontWeight: "bold",
+      color: theme.foreground.white,
+      marginVertical: 8,
+    },
+    subtitle: {
+      fontSize: 16,
+      color: theme.foreground.gray,
+      marginBottom: 50,
+    },
+    optionsContainer: {
+      gap: 16,
+    },
+    genderButton: {
+      paddingVertical: 24,
+      borderRadius: 12,
+      borderWidth: 2,
+      borderColor: theme.foreground.gray,
+      backgroundColor: theme.background.darker,
+      alignItems: "center",
+    },
+    genderButtonSelected: {
+      borderColor: theme.primary.main,
+      backgroundColor: theme.background.accent,
+    },
+    genderText: {
+      fontSize: 20,
+      fontWeight: "600",
+      color: theme.foreground.gray,
+    },
+    genderTextSelected: {
+      color: theme.primary.main,
+    },
+    continueButton: {
+      backgroundColor: theme.primary.main,
+      paddingVertical: 18,
+      borderRadius: 12,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    continueButtonDisabled: {
+      opacity: 0.5,
+    },
+    continueButtonText: {
+      color: theme.background.dark,
+      fontSize: 18,
+      fontWeight: "bold",
+    },
+  });
+}
 
 export default function GenderSelection() {
   const router = useRouter();
+  const { theme, setTheme } = useTheme();
   const [selectedGender, setSelectedGender] = useState<string>("");
 
   const handleContinue = () => {
     if (!selectedGender) return;
-    // TODO: Save gender preference
+    // Save gender preference and set theme
+    setTheme(selectedGender as "male" | "female");
     router.push("/get-started/health-connect");
   };
+
+  const styles = createStyles(theme);
 
   return (
     <View style={styles.container}>
@@ -74,64 +142,3 @@ export default function GenderSelection() {
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background.dark,
-    paddingHorizontal: 32,
-    paddingBottom: 20,
-  },
-  content: {
-    flex: 1,
-  },
-  title: {
-    fontSize: 32,
-    fontWeight: "bold",
-    color: colors.foreground.white,
-    marginVertical: 8,
-  },
-  subtitle: {
-    fontSize: 16,
-    color: colors.foreground.gray,
-    marginBottom: 50,
-  },
-  optionsContainer: {
-    gap: 16,
-  },
-  genderButton: {
-    paddingVertical: 24,
-    borderRadius: 12,
-    borderWidth: 2,
-    borderColor: colors.foreground.gray,
-    backgroundColor: colors.background.darker,
-    alignItems: "center",
-  },
-  genderButtonSelected: {
-    borderColor: colors.primary.main,
-    backgroundColor: colors.background.accent,
-  },
-  genderText: {
-    fontSize: 20,
-    fontWeight: "600",
-    color: colors.foreground.gray,
-  },
-  genderTextSelected: {
-    color: colors.primary.main,
-  },
-  continueButton: {
-    backgroundColor: colors.primary.main,
-    paddingVertical: 18,
-    borderRadius: 12,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  continueButtonDisabled: {
-    opacity: 0.5,
-  },
-  continueButtonText: {
-    color: colors.background.dark,
-    fontSize: 18,
-    fontWeight: "bold",
-  },
-});

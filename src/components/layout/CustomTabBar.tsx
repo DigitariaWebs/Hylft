@@ -8,7 +8,7 @@ import Animated, {
   withSpring,
 } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { colors } from "../../constants/colors";
+import { useTheme } from "../../contexts/ThemeContext";
 
 type IconName = keyof typeof Ionicons.glyphMap;
 
@@ -24,8 +24,11 @@ export function CustomTabBar({
   navigation,
 }: BottomTabBarProps) {
   const insets = useSafeAreaInsets();
+  const { theme } = useTheme();
   const [containerWidth, setContainerWidth] = React.useState(0);
   const tabWidth = containerWidth / state.routes.length;
+
+  const styles = createStyles(theme);
 
   return (
     <View
@@ -96,8 +99,11 @@ function TabButton({
   onPress,
   onLongPress,
 }: TabButtonProps) {
+  const { theme } = useTheme();
   const scale = useSharedValue(1);
   const translateY = useSharedValue(0);
+
+  const styles = createStyles(theme);
 
   React.useEffect(() => {
     scale.value = withSpring(isFocused ? 1.1 : 1, {
@@ -127,42 +133,44 @@ function TabButton({
         <Ionicons
           name={iconName}
           size={24}
-          color={isFocused ? colors.primary.main : colors.foreground.gray}
+          color={isFocused ? theme.primary.main : theme.foreground.gray}
         />
       </Animated.View>
     </TouchableOpacity>
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    position: "absolute",
-    bottom: 16,
-    left: 16,
-    right: 16,
-    flexDirection: "row",
-    backgroundColor: colors.background.darker,
-    borderTopWidth: 1,
-    borderTopColor: colors.background.accent,
-    borderRadius: 24,
-    overflow: "hidden",
-    paddingTop: 8,
-    zIndex: 50,
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: -2,
+function createStyles(theme: any) {
+  return StyleSheet.create({
+    container: {
+      position: "absolute",
+      bottom: 16,
+      left: 16,
+      right: 16,
+      flexDirection: "row",
+      backgroundColor: theme.background.darker,
+      borderTopWidth: 1,
+      borderTopColor: theme.background.accent,
+      borderRadius: 24,
+      overflow: "hidden",
+      paddingTop: 8,
+      zIndex: 50,
+      shadowColor: "#000",
+      shadowOffset: {
+        width: 0,
+        height: -2,
+      },
+      shadowOpacity: 0.35,
+      shadowRadius: 8,
     },
-    shadowOpacity: 0.35,
-    shadowRadius: 8,
-  },
-  tabButton: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    paddingVertical: 2,
-  },
-  iconContainer: {
-    marginBottom: 0,
-  },
-});
+    tabButton: {
+      flex: 1,
+      alignItems: "center",
+      justifyContent: "center",
+      paddingVertical: 2,
+    },
+    iconContainer: {
+      marginBottom: 0,
+    },
+  });
+}

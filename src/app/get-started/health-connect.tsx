@@ -2,10 +2,13 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import React from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import { colors } from "../../constants/colors";
+import { Theme } from "../../constants/themes";
+import { useTheme } from "../../contexts/ThemeContext";
 
 export default function HealthConnect() {
   const router = useRouter();
+  const { theme } = useTheme();
+  const styles = createStyles(theme);
 
   const handleEnableHealthConnect = () => {
     // TODO: Enable Health Connect integration
@@ -23,7 +26,7 @@ export default function HealthConnect() {
           <MaterialCommunityIcons
             name="heart-pulse"
             size={80}
-            color={colors.primary.main}
+            color={theme.primary.main}
           />
         </View>
 
@@ -38,7 +41,7 @@ export default function HealthConnect() {
             <MaterialCommunityIcons
               name="check-circle"
               size={24}
-              color={colors.primary.main}
+              color={theme.primary.main}
             />
             <Text style={styles.benefitText}>Automatic activity tracking</Text>
           </View>
@@ -46,7 +49,7 @@ export default function HealthConnect() {
             <MaterialCommunityIcons
               name="check-circle"
               size={24}
-              color={colors.primary.main}
+              color={theme.primary.main}
             />
             <Text style={styles.benefitText}>Personalized recommendations</Text>
           </View>
@@ -54,7 +57,7 @@ export default function HealthConnect() {
             <MaterialCommunityIcons
               name="check-circle"
               size={24}
-              color={colors.primary.main}
+              color={theme.primary.main}
             />
             <Text style={styles.benefitText}>Better progress insights</Text>
           </View>
@@ -82,72 +85,73 @@ export default function HealthConnect() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background.dark,
-    paddingHorizontal: 32,
-    paddingBottom: 20,
-  },
-  content: {
-    flex: 1,
-    alignItems: "center",
-  },
-  iconContainer: {
-    marginBottom: 32,
-    marginTop: 20,
-  },
-  title: {
-    fontSize: 32,
-    fontWeight: "bold",
-    color: colors.foreground.white,
-    textAlign: "center",
-    marginBottom: 16,
-  },
-  subtitle: {
-    fontSize: 16,
-    color: colors.foreground.gray,
-    textAlign: "center",
-    lineHeight: 24,
-    marginBottom: 40,
-  },
-  benefitsContainer: {
-    width: "100%",
-    gap: 20,
-  },
-  benefitItem: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 12,
-  },
-  benefitText: {
-    fontSize: 16,
-    color: colors.foreground.white,
-    flex: 1,
-  },
-  buttonsContainer: {
-    gap: 12,
-  },
-  enableButton: {
-    backgroundColor: colors.primary.main,
-    paddingVertical: 18,
-    borderRadius: 12,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  enableButtonText: {
-    color: colors.background.dark,
-    fontSize: 18,
-    fontWeight: "bold",
-  },
-  notNowButton: {
-    paddingVertical: 18,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  notNowButtonText: {
-    color: colors.foreground.white,
-    fontSize: 16,
-    fontWeight: "600",
-  },
-});
+const createStyles = (theme: Theme) =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: theme.background.dark,
+      paddingHorizontal: 32,
+      paddingBottom: 20,
+    },
+    content: {
+      flex: 1,
+      alignItems: "center",
+    },
+    iconContainer: {
+      marginBottom: 32,
+      marginTop: 20,
+    },
+    title: {
+      fontSize: 32,
+      fontWeight: "bold",
+      color: theme.foreground.white,
+      textAlign: "center",
+      marginBottom: 16,
+    },
+    subtitle: {
+      fontSize: 16,
+      color: theme.foreground.gray,
+      textAlign: "center",
+      lineHeight: 24,
+      marginBottom: 40,
+    },
+    benefitsContainer: {
+      width: "100%",
+      gap: 20,
+    },
+    benefitItem: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 12,
+    },
+    benefitText: {
+      fontSize: 16,
+      color: theme.foreground.white,
+      flex: 1,
+    },
+    buttonsContainer: {
+      gap: 12,
+    },
+    enableButton: {
+      backgroundColor: theme.primary.main,
+      paddingVertical: 18,
+      borderRadius: 12,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    enableButtonText: {
+      color: theme.background.dark,
+      fontSize: 18,
+      fontWeight: "bold",
+    },
+    notNowButton: {
+      paddingVertical: 18,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    notNowButtonText: {
+      color: theme.foreground.white,
+      fontSize: 16,
+      fontWeight: "600",
+    },
+  });

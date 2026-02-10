@@ -1,7 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
 import React, { memo } from "react";
 import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import { colors } from "../../constants/colors";
+import { useTheme } from "../../contexts/ThemeContext";
 
 export type PostData = {
   id: string;
@@ -30,6 +30,8 @@ type PostProps = {
 
 const Post = memo(
   ({ post, onLike }: PostProps) => {
+    const { theme } = useTheme();
+    const styles = createStyles(theme);
     return (
       <View style={styles.postContainer}>
         {/* Post Header */}
@@ -43,7 +45,7 @@ const Post = memo(
             <Ionicons
               name="ellipsis-vertical"
               size={20}
-              color={colors.foreground.white}
+              color={theme.foreground.white}
             />
           </TouchableOpacity>
         </View>
@@ -93,21 +95,21 @@ const Post = memo(
               <Ionicons
                 name={post.isLiked ? "trophy" : "trophy-outline"}
                 size={28}
-                color={post.isLiked ? "#FFD700" : colors.foreground.white}
+                color={post.isLiked ? "#FFD700" : theme.foreground.white}
               />
             </TouchableOpacity>
             <TouchableOpacity style={styles.actionButton}>
               <Ionicons
                 name="chatbubble-outline"
                 size={26}
-                color={colors.foreground.white}
+                color={theme.foreground.white}
               />
             </TouchableOpacity>
             <TouchableOpacity style={styles.actionButton}>
               <Ionicons
                 name="share-outline"
                 size={26}
-                color={colors.foreground.white}
+                color={theme.foreground.white}
               />
             </TouchableOpacity>
           </View>
@@ -115,7 +117,7 @@ const Post = memo(
             <Ionicons
               name="bookmark-outline"
               size={26}
-              color={colors.foreground.white}
+              color={theme.foreground.white}
             />
           </TouchableOpacity>
         </View>
@@ -150,122 +152,124 @@ const Post = memo(
 
 Post.displayName = "Post";
 
-const styles = StyleSheet.create({
-  postContainer: {
-    marginBottom: 36,
-  },
-  postHeader: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-  },
-  avatar: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    marginRight: 12,
-  },
-  userInfo: {
-    flex: 1,
-  },
-  username: {
-    fontSize: 15,
-    fontWeight: "600",
-    color: colors.foreground.white,
-  },
-  timestamp: {
-    fontSize: 12,
-    color: colors.foreground.gray,
-    marginTop: 2,
-  },
-  moreButton: {
-    padding: 4,
-  },
-  postImage: {
-    width: "100%",
-    height: 400,
-    backgroundColor: colors.background.darker,
-  },
-  actionsContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-  },
-  leftActions: {
-    flexDirection: "row",
-    gap: 12,
-  },
-  actionButton: {
-    padding: 4,
-  },
-  metricsSection: {
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.background.darker,
-  },
-  postInfo: {
-    paddingHorizontal: 16,
-    paddingBottom: 8,
-  },
-  metadataContainer: {
-    flexDirection: "row",
-    gap: 8,
-    marginBottom: 12,
-    flexWrap: "wrap",
-  },
-  metadataTag: {
-    backgroundColor: colors.primary.main,
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 20,
-  },
-  metadataLabel: {
-    fontSize: 12,
-    fontWeight: "600",
-    color: colors.background.dark,
-  },
-  metricsContainer: {
-    flexDirection: "row",
-    gap: 12,
-    flexWrap: "wrap",
-  },
-  metricItem: {
-    flex: 1,
-    minWidth: 70,
-    alignItems: "center",
-    paddingVertical: 6,
-  },
-  metricLabel: {
-    fontSize: 11,
-    color: colors.foreground.gray,
-    marginBottom: 4,
-  },
-  metricValue: {
-    fontSize: 14,
-    fontWeight: "700",
-    color: colors.foreground.white,
-  },
-  likes: {
-    fontSize: 14,
-    fontWeight: "600",
-    color: colors.foreground.white,
-    marginBottom: 8,
-  },
-  caption: {
-    fontSize: 14,
-    color: colors.foreground.white,
-    lineHeight: 20,
-    marginBottom: 4,
-  },
-  viewComments: {
-    fontSize: 14,
-    color: colors.foreground.gray,
-    marginTop: 4,
-  },
-});
+function createStyles(theme: any) {
+  return StyleSheet.create({
+    postContainer: {
+      marginBottom: 36,
+    },
+    postHeader: {
+      flexDirection: "row",
+      alignItems: "center",
+      paddingHorizontal: 16,
+      paddingVertical: 12,
+    },
+    avatar: {
+      width: 40,
+      height: 40,
+      borderRadius: 20,
+      marginRight: 12,
+    },
+    userInfo: {
+      flex: 1,
+    },
+    username: {
+      fontSize: 15,
+      fontWeight: "600",
+      color: theme.foreground.white,
+    },
+    timestamp: {
+      fontSize: 12,
+      color: theme.foreground.gray,
+      marginTop: 2,
+    },
+    moreButton: {
+      padding: 4,
+    },
+    postImage: {
+      width: "100%",
+      height: 400,
+      backgroundColor: theme.background.darker,
+    },
+    actionsContainer: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+      paddingHorizontal: 12,
+      paddingVertical: 8,
+    },
+    leftActions: {
+      flexDirection: "row",
+      gap: 12,
+    },
+    actionButton: {
+      padding: 4,
+    },
+    metricsSection: {
+      paddingHorizontal: 16,
+      paddingVertical: 12,
+      borderBottomWidth: 1,
+      borderBottomColor: theme.background.darker,
+    },
+    postInfo: {
+      paddingHorizontal: 16,
+      paddingBottom: 8,
+    },
+    metadataContainer: {
+      flexDirection: "row",
+      gap: 8,
+      marginBottom: 12,
+      flexWrap: "wrap",
+    },
+    metadataTag: {
+      backgroundColor: theme.primary.main,
+      paddingHorizontal: 12,
+      paddingVertical: 6,
+      borderRadius: 20,
+    },
+    metadataLabel: {
+      fontSize: 12,
+      fontWeight: "600",
+      color: theme.background.dark,
+    },
+    metricsContainer: {
+      flexDirection: "row",
+      gap: 12,
+      flexWrap: "wrap",
+    },
+    metricItem: {
+      flex: 1,
+      minWidth: 70,
+      alignItems: "center",
+      paddingVertical: 6,
+    },
+    metricLabel: {
+      fontSize: 11,
+      color: theme.foreground.gray,
+      marginBottom: 4,
+    },
+    metricValue: {
+      fontSize: 14,
+      fontWeight: "700",
+      color: theme.foreground.white,
+    },
+    likes: {
+      fontSize: 14,
+      fontWeight: "600",
+      color: theme.foreground.white,
+      marginBottom: 8,
+    },
+    caption: {
+      fontSize: 14,
+      color: theme.foreground.white,
+      lineHeight: 20,
+      marginBottom: 4,
+    },
+    viewComments: {
+      fontSize: 14,
+      color: theme.foreground.gray,
+      marginTop: 4,
+    },
+  });
+}
 
 export default Post;

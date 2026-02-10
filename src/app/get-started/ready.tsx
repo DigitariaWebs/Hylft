@@ -2,10 +2,13 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import React, { useEffect } from "react";
 import { StyleSheet, Text, View } from "react-native";
-import { colors } from "../../constants/colors";
+import { Theme } from "../../constants/themes";
+import { useTheme } from "../../contexts/ThemeContext";
 
 export default function Ready() {
   const router = useRouter();
+  const { theme } = useTheme();
+  const styles = createStyles(theme);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -22,7 +25,7 @@ export default function Ready() {
           <MaterialCommunityIcons
             name="check-circle"
             size={120}
-            color={colors.primary.main}
+            color={theme.primary.main}
           />
         </View>
 
@@ -35,32 +38,33 @@ export default function Ready() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background.dark,
-    paddingHorizontal: 32,
-    paddingBottom: 20,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  content: {
-    alignItems: "center",
-  },
-  iconContainer: {
-    marginBottom: 40,
-  },
-  title: {
-    fontSize: 40,
-    fontWeight: "bold",
-    color: colors.foreground.white,
-    textAlign: "center",
-    marginBottom: 16,
-  },
-  subtitle: {
-    fontSize: 18,
-    color: colors.foreground.gray,
-    textAlign: "center",
-    lineHeight: 28,
-  },
-});
+const createStyles = (theme: Theme) =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: theme.background.dark,
+      paddingHorizontal: 32,
+      paddingBottom: 20,
+      justifyContent: "center",
+      alignItems: "center",
+    },
+    content: {
+      alignItems: "center",
+    },
+    iconContainer: {
+      marginBottom: 40,
+    },
+    title: {
+      fontSize: 40,
+      fontWeight: "bold",
+      color: theme.foreground.white,
+      textAlign: "center",
+      marginBottom: 16,
+    },
+    subtitle: {
+      fontSize: 18,
+      color: theme.foreground.gray,
+      textAlign: "center",
+      lineHeight: 28,
+    },
+  });

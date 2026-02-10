@@ -2,10 +2,13 @@ import { MaterialIcons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import React from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import { colors } from "../../constants/colors";
+import { Theme } from "../../constants/themes";
+import { useTheme } from "../../contexts/ThemeContext";
 
 export default function EmailPreferences() {
   const router = useRouter();
+  const { theme } = useTheme();
+  const styles = createStyles(theme);
 
   const handleAccept = () => {
     // TODO: Save email preference
@@ -21,7 +24,7 @@ export default function EmailPreferences() {
     <View style={styles.container}>
       <View style={styles.content}>
         <View style={styles.iconContainer}>
-          <MaterialIcons name="email" size={80} color={colors.primary.main} />
+          <MaterialIcons name="email" size={80} color={theme.primary.main} />
         </View>
 
         <Text style={styles.title}>Can we send you emails?</Text>
@@ -34,7 +37,7 @@ export default function EmailPreferences() {
             <MaterialIcons
               name="lightbulb-outline"
               size={24}
-              color={colors.primary.main}
+              color={theme.primary.main}
             />
             <Text style={styles.listItemText}>
               Tips for getting the most out of Hylift
@@ -44,7 +47,7 @@ export default function EmailPreferences() {
             <MaterialIcons
               name="new-releases"
               size={24}
-              color={colors.primary.main}
+              color={theme.primary.main}
             />
             <Text style={styles.listItemText}>New feature announcements</Text>
           </View>
@@ -52,16 +55,12 @@ export default function EmailPreferences() {
             <MaterialIcons
               name="local-offer"
               size={24}
-              color={colors.primary.main}
+              color={theme.primary.main}
             />
             <Text style={styles.listItemText}>Promotional offers</Text>
           </View>
           <View style={styles.listItem}>
-            <MaterialIcons
-              name="logout"
-              size={24}
-              color={colors.primary.main}
-            />
+            <MaterialIcons name="logout" size={24} color={theme.primary.main} />
             <Text style={styles.listItemText}>Opt out anytime</Text>
           </View>
         </View>
@@ -88,73 +87,74 @@ export default function EmailPreferences() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background.dark,
-    paddingHorizontal: 32,
-    paddingBottom: 20,
-  },
-  content: {
-    flex: 1,
-    alignItems: "center",
-  },
-  iconContainer: {
-    marginBottom: 32,
-    marginTop: 20,
-  },
-  title: {
-    fontSize: 32,
-    fontWeight: "bold",
-    color: colors.foreground.white,
-    textAlign: "center",
-    marginBottom: 12,
-  },
-  promiseText: {
-    fontSize: 16,
-    color: colors.foreground.gray,
-    textAlign: "center",
-    marginBottom: 40,
-    fontStyle: "italic",
-  },
-  listContainer: {
-    width: "100%",
-    gap: 24,
-  },
-  listItem: {
-    flexDirection: "row",
-    alignItems: "flex-start",
-    gap: 16,
-  },
-  listItemText: {
-    fontSize: 16,
-    color: colors.foreground.white,
-    flex: 1,
-    lineHeight: 24,
-  },
-  buttonsContainer: {
-    gap: 12,
-  },
-  acceptButton: {
-    backgroundColor: colors.primary.main,
-    paddingVertical: 18,
-    borderRadius: 12,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  acceptButtonText: {
-    color: colors.background.dark,
-    fontSize: 18,
-    fontWeight: "bold",
-  },
-  declineButton: {
-    paddingVertical: 18,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  declineButtonText: {
-    color: colors.foreground.white,
-    fontSize: 16,
-    fontWeight: "600",
-  },
-});
+const createStyles = (theme: Theme) =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: theme.background.dark,
+      paddingHorizontal: 32,
+      paddingBottom: 20,
+    },
+    content: {
+      flex: 1,
+      alignItems: "center",
+    },
+    iconContainer: {
+      marginBottom: 32,
+      marginTop: 20,
+    },
+    title: {
+      fontSize: 32,
+      fontWeight: "bold",
+      color: theme.foreground.white,
+      textAlign: "center",
+      marginBottom: 12,
+    },
+    promiseText: {
+      fontSize: 16,
+      color: theme.foreground.gray,
+      textAlign: "center",
+      marginBottom: 40,
+      fontStyle: "italic",
+    },
+    listContainer: {
+      width: "100%",
+      gap: 24,
+    },
+    listItem: {
+      flexDirection: "row",
+      alignItems: "flex-start",
+      gap: 16,
+    },
+    listItemText: {
+      fontSize: 16,
+      color: theme.foreground.white,
+      flex: 1,
+      lineHeight: 24,
+    },
+    buttonsContainer: {
+      gap: 12,
+    },
+    acceptButton: {
+      backgroundColor: theme.primary.main,
+      paddingVertical: 18,
+      borderRadius: 12,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    acceptButtonText: {
+      color: theme.background.dark,
+      fontSize: 18,
+      fontWeight: "bold",
+    },
+    declineButton: {
+      paddingVertical: 18,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    declineButtonText: {
+      color: theme.foreground.white,
+      fontSize: 16,
+      fontWeight: "600",
+    },
+  });

@@ -11,14 +11,124 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { colors } from "../../constants/colors";
+import { Theme } from "../../constants/themes";
+import { useTheme } from "../../contexts/ThemeContext";
 import { auth } from "../../utils/auth";
 
+function createStyles(theme: Theme) {
+  return StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: theme.background.dark,
+    },
+    logoContainer: {
+      alignItems: "center",
+      marginBottom: 40,
+    },
+    logo: {
+      width: 120,
+      height: 40,
+    },
+    contentContainer: {
+      flex: 1,
+      paddingHorizontal: 32,
+      paddingTop: 20,
+    },
+    title: {
+      fontSize: 32,
+      fontWeight: "bold",
+      color: theme.foreground.white,
+      textAlign: "center",
+      marginBottom: 8,
+    },
+    subtitle: {
+      fontSize: 16,
+      color: theme.foreground.gray,
+      textAlign: "center",
+      marginBottom: 40,
+    },
+    formContainer: {
+      flex: 1,
+    },
+    inputContainer: {
+      marginBottom: 20,
+    },
+    inputLabel: {
+      fontSize: 16,
+      fontWeight: "600",
+      color: theme.foreground.white,
+      marginBottom: 8,
+    },
+    input: {
+      backgroundColor: theme.background.darker,
+      borderRadius: 12,
+      paddingHorizontal: 16,
+      paddingVertical: 16,
+      fontSize: 16,
+      color: theme.foreground.white,
+      borderWidth: 1,
+      borderColor: theme.background.accent,
+    },
+    forgotPasswordButton: {
+      alignSelf: "flex-end",
+      marginBottom: 32,
+    },
+    forgotPasswordText: {
+      color: theme.primary.main,
+      fontSize: 14,
+      fontWeight: "600",
+    },
+    signInButton: {
+      backgroundColor: theme.primary.main,
+      paddingVertical: 18,
+      borderRadius: 12,
+      alignItems: "center",
+      justifyContent: "center",
+      marginBottom: 24,
+    },
+    disabledButton: {
+      opacity: 0.5,
+    },
+    signInButtonText: {
+      color: theme.background.dark,
+      fontSize: 16,
+      fontWeight: "600",
+    },
+    dividerContainer: {
+      flexDirection: "row",
+      alignItems: "center",
+      marginBottom: 24,
+    },
+    divider: {
+      flex: 1,
+      height: 1,
+      backgroundColor: theme.background.accent,
+    },
+    dividerText: {
+      color: theme.foreground.gray,
+      fontSize: 14,
+      marginHorizontal: 16,
+    },
+    signUpButton: {
+      alignItems: "center",
+      paddingVertical: 16,
+    },
+    signUpButtonText: {
+      color: theme.primary.main,
+      fontSize: 16,
+      fontWeight: "600",
+    },
+  });
+}
+
 export default function SignIn() {
+  const { theme } = useTheme();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
+
+  const styles = createStyles(theme);
 
   const handleSignIn = async () => {
     if (!email || !password) {
@@ -54,11 +164,7 @@ export default function SignIn() {
     >
       {/* Logo */}
       <View style={styles.logoContainer}>
-        <Image
-          source={require("../../../assets/images/Logo.png")}
-          style={styles.logo}
-          resizeMode="contain"
-        />
+        <Image source={theme.logo} style={styles.logo} resizeMode="contain" />
       </View>
 
       <View style={styles.contentContainer}>
@@ -73,7 +179,7 @@ export default function SignIn() {
             <TextInput
               style={styles.input}
               placeholder="Enter your email"
-              placeholderTextColor={colors.foreground.gray}
+              placeholderTextColor={theme.foreground.gray}
               value={email}
               onChangeText={setEmail}
               keyboardType="email-address"
@@ -87,7 +193,7 @@ export default function SignIn() {
             <TextInput
               style={styles.input}
               placeholder="Enter your password"
-              placeholderTextColor={colors.foreground.gray}
+              placeholderTextColor={theme.foreground.gray}
               value={password}
               onChangeText={setPassword}
               secureTextEntry
@@ -132,109 +238,3 @@ export default function SignIn() {
     </KeyboardAvoidingView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background.dark,
-  },
-  logoContainer: {
-    alignItems: "center",
-    marginBottom: 40,
-  },
-  logo: {
-    width: 120,
-    height: 40,
-  },
-  contentContainer: {
-    flex: 1,
-    paddingHorizontal: 32,
-  },
-  title: {
-    fontSize: 32,
-    fontWeight: "bold",
-    color: colors.foreground.white,
-    textAlign: "center",
-    marginBottom: 8,
-  },
-  subtitle: {
-    fontSize: 16,
-    color: colors.foreground.gray,
-    textAlign: "center",
-    marginBottom: 40,
-    lineHeight: 24,
-  },
-  formContainer: {
-    flex: 1,
-  },
-  inputContainer: {
-    marginBottom: 20,
-  },
-  inputLabel: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: colors.foreground.white,
-    marginBottom: 8,
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: colors.foreground.gray,
-    borderRadius: 12,
-    paddingHorizontal: 16,
-    paddingVertical: 16,
-    fontSize: 16,
-    color: colors.foreground.white,
-    backgroundColor: colors.background.darker,
-  },
-  forgotPasswordButton: {
-    alignSelf: "flex-end",
-    marginBottom: 32,
-  },
-  forgotPasswordText: {
-    color: colors.primary.main,
-    fontSize: 14,
-    fontWeight: "600",
-  },
-  signInButton: {
-    backgroundColor: colors.primary.main,
-    paddingVertical: 18,
-    borderRadius: 12,
-    alignItems: "center",
-    justifyContent: "center",
-    marginBottom: 24,
-  },
-  disabledButton: {
-    opacity: 0.6,
-  },
-  signInButtonText: {
-    color: colors.background.dark,
-    fontSize: 18,
-    fontWeight: "bold",
-  },
-  dividerContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 24,
-  },
-  divider: {
-    flex: 1,
-    height: 1,
-    backgroundColor: colors.foreground.gray,
-    opacity: 0.3,
-  },
-  dividerText: {
-    paddingHorizontal: 16,
-    color: colors.foreground.gray,
-    fontSize: 14,
-  },
-  signUpButton: {
-    paddingVertical: 16,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  signUpButtonText: {
-    color: colors.foreground.white,
-    fontSize: 16,
-    fontWeight: "600",
-  },
-});

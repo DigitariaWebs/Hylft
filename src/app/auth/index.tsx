@@ -10,7 +10,8 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { colors } from "../../constants/colors";
+import { Theme } from "../../constants/themes";
+import { useTheme } from "../../contexts/ThemeContext";
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get("window");
 
@@ -21,10 +22,102 @@ const BACKGROUND_IMAGES = [
   require("../../../assets/images/AuthPage/PullUp.jpg"),
 ];
 
+function createStyles(theme: Theme) {
+  return StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: theme.background.dark,
+    },
+    backgroundImage: {
+      position: "absolute",
+      width: SCREEN_WIDTH,
+      height: SCREEN_HEIGHT,
+    },
+    overlay: {
+      position: "absolute",
+      width: SCREEN_WIDTH,
+      height: SCREEN_HEIGHT,
+      backgroundColor: "rgba(0, 0, 0, 0.5)",
+    },
+    content: {
+      flex: 1,
+      justifyContent: "space-between",
+      paddingVertical: 40,
+    },
+    logoContainer: {
+      alignItems: "center",
+      marginTop: 20,
+    },
+    logo: {
+      width: 140,
+      height: 50,
+    },
+    bottomSection: {
+      paddingHorizontal: 32,
+      paddingBottom: 20,
+    },
+    title: {
+      fontSize: 28,
+      fontWeight: "bold",
+      color: theme.foreground.white,
+      textAlign: "center",
+      marginBottom: 32,
+    },
+    googleButton: {
+      backgroundColor: theme.primary.main,
+      paddingVertical: 18,
+      borderRadius: 12,
+      alignItems: "center",
+      justifyContent: "center",
+      marginBottom: 16,
+      flexDirection: "row",
+    },
+    googleButtonText: {
+      color: theme.background.dark,
+      fontSize: 16,
+      fontWeight: "600",
+    },
+    emailButton: {
+      backgroundColor: theme.foreground.white,
+      paddingVertical: 18,
+      borderRadius: 12,
+      alignItems: "center",
+      justifyContent: "center",
+      marginBottom: 24,
+      flexDirection: "row",
+    },
+    emailButtonText: {
+      color: theme.background.dark,
+      fontSize: 16,
+      fontWeight: "600",
+    },
+    buttonIcon: {
+      marginRight: 12,
+    },
+    signInContainer: {
+      flexDirection: "row",
+      justifyContent: "center",
+      alignItems: "center",
+    },
+    signInText: {
+      color: theme.foreground.white,
+      fontSize: 14,
+    },
+    signInLink: {
+      color: theme.primary.main,
+      fontSize: 14,
+      fontWeight: "600",
+    },
+  });
+}
+
 export default function AuthLanding() {
   const router = useRouter();
+  const { theme } = useTheme();
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const fadeAnim = useRef(new Animated.Value(1)).current;
+
+  const styles = createStyles(theme);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -58,7 +151,7 @@ export default function AuthLanding() {
     // Username: test988, Email: test@gmail.com, Password: test2003
     console.log("Google Sign Up - Test Mode");
     console.log("Username: test988, Email: test@gmail.com, Password: test2003");
-    
+
     // Navigate directly to get-started flow without saving auth state
     router.navigate("/get-started/units");
   };
@@ -83,11 +176,7 @@ export default function AuthLanding() {
       <View style={styles.content}>
         {/* Logo */}
         <View style={styles.logoContainer}>
-          <Image
-            source={require("../../../assets/images/Logo.png")}
-            style={styles.logo}
-            resizeMode="contain"
-          />
+          <Image source={theme.logo} style={styles.logo} resizeMode="contain" />
         </View>
 
         {/* Bottom Section */}
@@ -103,7 +192,7 @@ export default function AuthLanding() {
             <AntDesign
               name="google"
               size={20}
-              color={colors.background.dark}
+              color={theme.background.dark}
               style={styles.buttonIcon}
             />
             <Text style={styles.googleButtonText}>Continue with Google</Text>
@@ -118,7 +207,7 @@ export default function AuthLanding() {
             <MaterialIcons
               name="email"
               size={20}
-              color={colors.background.dark}
+              color={theme.background.dark}
               style={styles.buttonIcon}
             />
             <Text style={styles.emailButtonText}>Continue with Email</Text>
@@ -136,90 +225,3 @@ export default function AuthLanding() {
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background.dark,
-  },
-  backgroundImage: {
-    position: "absolute",
-    width: SCREEN_WIDTH,
-    height: SCREEN_HEIGHT,
-  },
-  overlay: {
-    position: "absolute",
-    width: SCREEN_WIDTH,
-    height: SCREEN_HEIGHT,
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
-  },
-  content: {
-    flex: 1,
-    justifyContent: "space-between",
-    paddingVertical: 40,
-  },
-  logoContainer: {
-    alignItems: "center",
-    marginTop: 20,
-  },
-  logo: {
-    width: 140,
-    height: 50,
-  },
-  bottomSection: {
-    paddingHorizontal: 32,
-    paddingBottom: 20,
-  },
-  title: {
-    fontSize: 28,
-    fontWeight: "bold",
-    color: colors.foreground.white,
-    textAlign: "center",
-    marginBottom: 32,
-  },
-  googleButton: {
-    backgroundColor: colors.primary.main,
-    paddingVertical: 18,
-    borderRadius: 12,
-    alignItems: "center",
-    justifyContent: "center",
-    marginBottom: 16,
-    flexDirection: "row",
-  },
-  googleButtonText: {
-    color: colors.background.dark,
-    fontSize: 16,
-    fontWeight: "600",
-  },
-  emailButton: {
-    backgroundColor: colors.foreground.white,
-    paddingVertical: 18,
-    borderRadius: 12,
-    alignItems: "center",
-    justifyContent: "center",
-    marginBottom: 24,
-    flexDirection: "row",
-  },
-  emailButtonText: {
-    color: colors.background.dark,
-    fontSize: 16,
-    fontWeight: "600",
-  },
-  buttonIcon: {
-    marginRight: 12,
-  },
-  signInContainer: {
-    flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  signInText: {
-    color: colors.foreground.white,
-    fontSize: 14,
-  },
-  signInLink: {
-    color: colors.primary.main,
-    fontSize: 14,
-    fontWeight: "600",
-  },
-});
