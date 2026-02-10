@@ -20,19 +20,19 @@ export default function Index() {
 
       // Navigation logic:
       // 1. If not seen onboarding -> go to onboarding
-      // 2. If seen onboarding but not logged in -> go to signin
+      // 2. If seen onboarding but not logged in -> go to auth landing
       // 3. If logged in -> go to home
       if (!hasSeenOnboarding) {
-        router.replace("/OnBoarding");
+        router.navigate("/OnBoarding");
       } else if (!isLoggedIn) {
-        router.replace("/(auth)/signin");
+        router.navigate("/auth");
       } else {
-        router.replace("/Home");
+        router.navigate("/Home");
       }
     } catch (error) {
       console.error("Error checking auth status:", error);
       // Default to onboarding on error
-      router.replace("/OnBoarding");
+      router.navigate("/OnBoarding");
     }
   };
 

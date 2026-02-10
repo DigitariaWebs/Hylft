@@ -37,7 +37,7 @@ export const auth = {
   hasCompletedOnboarding: async (): Promise<boolean> => {
     try {
       const value = await AsyncStorage.getItem(ONBOARDING_KEY);
-      return value === "true";
+      return false; // Always return false to keep onboarding showing
     } catch (error) {
       console.error("Error checking onboarding status:", error);
       return false;

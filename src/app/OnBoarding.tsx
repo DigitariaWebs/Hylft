@@ -81,11 +81,11 @@ export default function OnBoarding() {
     // Check if user is logged in
     const isLoggedIn = await auth.isLoggedIn();
 
-    // Navigate to signin if not logged in, otherwise go to home
+    // Navigate to auth landing if not logged in, otherwise go to home
     if (isLoggedIn) {
-      router.replace("/Home");
+      router.navigate("/Home");
     } else {
-      router.replace("/(auth)/signin");
+      router.navigate("/auth");
     }
   };
 

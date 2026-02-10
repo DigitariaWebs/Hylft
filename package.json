@@ -3,13 +3,11 @@
   "main": "expo-router/entry",
   "version": "1.0.0",
   "scripts": {
-    "dev": "expo start",
-    "dev --c": "expo start --clear",
-    "reset-project": "node ./scripts/reset-project.js",
-    "android": "expo start --android",
-    "ios": "expo start --ios",
-    "web": "expo start --web",
-    "lint": "expo lint"
+    "dev": "bun expo start",
+    "android": "bun expo start --android",
+    "ios": "bun expo start --ios",
+    "web": "bun expo start --web",
+    "install": "bun expo install"
   },
   "dependencies": {
     "@expo/vector-icons": "^15.0.3",

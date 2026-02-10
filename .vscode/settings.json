@@ -15,7 +15,9 @@
     "**/.symlinks": true,
     "**/.plugin_symlinks": true,
     "**/.vscode": true,
-    ".vscode": true
+    ".vscode": true,
+    "**/.expo": true,
+    ".expo": true
   },
   "explorerExclude.backup": {}
 }
