@@ -1,16 +1,16 @@
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
-    Alert,
-    Image,
-    KeyboardAvoidingView,
-    Platform,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  Alert,
+  Image,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import { colors } from "../../constants/colors";
 import { auth } from "../../utils/auth";
@@ -58,8 +58,8 @@ export default function SignUp() {
       await auth.setLoggedIn();
 
       setIsLoading(false);
-      // Navigate to home after successful signup
-      router.navigate("/Home");
+      // Navigate to get-started flow after successful signup
+      router.navigate("/get-started/units");
     }, 1500);
   };
 

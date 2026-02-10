@@ -1,0 +1,160 @@
+import { MaterialIcons } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
+import React from "react";
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { colors } from "../../constants/colors";
+
+export default function EmailPreferences() {
+  const router = useRouter();
+
+  const handleAccept = () => {
+    // TODO: Save email preference
+    router.push("/get-started/ready");
+  };
+
+  const handleDecline = () => {
+    // TODO: Save email preference
+    router.push("/get-started/ready");
+  };
+
+  return (
+    <View style={styles.container}>
+      <View style={styles.content}>
+        <View style={styles.iconContainer}>
+          <MaterialIcons name="email" size={80} color={colors.primary.main} />
+        </View>
+
+        <Text style={styles.title}>Can we send you emails?</Text>
+        <Text style={styles.promiseText}>
+          No spam, promise. We hate it too.
+        </Text>
+
+        <View style={styles.listContainer}>
+          <View style={styles.listItem}>
+            <MaterialIcons
+              name="lightbulb-outline"
+              size={24}
+              color={colors.primary.main}
+            />
+            <Text style={styles.listItemText}>
+              Tips for getting the most out of Hylift
+            </Text>
+          </View>
+          <View style={styles.listItem}>
+            <MaterialIcons
+              name="new-releases"
+              size={24}
+              color={colors.primary.main}
+            />
+            <Text style={styles.listItemText}>New feature announcements</Text>
+          </View>
+          <View style={styles.listItem}>
+            <MaterialIcons
+              name="local-offer"
+              size={24}
+              color={colors.primary.main}
+            />
+            <Text style={styles.listItemText}>Promotional offers</Text>
+          </View>
+          <View style={styles.listItem}>
+            <MaterialIcons
+              name="logout"
+              size={24}
+              color={colors.primary.main}
+            />
+            <Text style={styles.listItemText}>Opt out anytime</Text>
+          </View>
+        </View>
+      </View>
+
+      <View style={styles.buttonsContainer}>
+        <TouchableOpacity
+          style={styles.acceptButton}
+          onPress={handleAccept}
+          activeOpacity={0.8}
+        >
+          <Text style={styles.acceptButtonText}>Sure!</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.declineButton}
+          onPress={handleDecline}
+          activeOpacity={0.7}
+        >
+          <Text style={styles.declineButtonText}>No, thanks</Text>
+        </TouchableOpacity>
+      </View>
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: colors.background.dark,
+    paddingHorizontal: 32,
+    paddingBottom: 20,
+  },
+  content: {
+    flex: 1,
+    alignItems: "center",
+  },
+  iconContainer: {
+    marginBottom: 32,
+    marginTop: 20,
+  },
+  title: {
+    fontSize: 32,
+    fontWeight: "bold",
+    color: colors.foreground.white,
+    textAlign: "center",
+    marginBottom: 12,
+  },
+  promiseText: {
+    fontSize: 16,
+    color: colors.foreground.gray,
+    textAlign: "center",
+    marginBottom: 40,
+    fontStyle: "italic",
+  },
+  listContainer: {
+    width: "100%",
+    gap: 24,
+  },
+  listItem: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    gap: 16,
+  },
+  listItemText: {
+    fontSize: 16,
+    color: colors.foreground.white,
+    flex: 1,
+    lineHeight: 24,
+  },
+  buttonsContainer: {
+    gap: 12,
+  },
+  acceptButton: {
+    backgroundColor: colors.primary.main,
+    paddingVertical: 18,
+    borderRadius: 12,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  acceptButtonText: {
+    color: colors.background.dark,
+    fontSize: 18,
+    fontWeight: "bold",
+  },
+  declineButton: {
+    paddingVertical: 18,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  declineButtonText: {
+    color: colors.foreground.white,
+    fontSize: 16,
+    fontWeight: "600",
+  },
+});

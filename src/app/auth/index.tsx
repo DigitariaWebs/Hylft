@@ -54,8 +54,13 @@ export default function AuthLanding() {
   };
 
   const handleGoogleSignUp = () => {
-    // TODO: Implement Google Sign Up
-    console.log("Google Sign Up");
+    // Test mode: Simulate Google Sign Up with test credentials
+    // Username: test988, Email: test@gmail.com, Password: test2003
+    console.log("Google Sign Up - Test Mode");
+    console.log("Username: test988, Email: test@gmail.com, Password: test2003");
+    
+    // Navigate directly to get-started flow without saving auth state
+    router.navigate("/get-started/units");
   };
 
   const handleSignIn = () => {
