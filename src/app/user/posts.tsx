@@ -1,0 +1,331 @@
+import { Ionicons } from "@expo/vector-icons";
+import { useLocalSearchParams, useRouter } from "expo-router";
+import React, { useEffect, useRef, useState } from "react";
+import {
+  FlatList,
+  Image,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
+import LikeableImage from "../../components/ui/LikeableImage";
+import { colors } from "../../constants/colors";
+import { getPostsByUserId, getUserById } from "../../data/mockData";
+
+interface UserPost {
+  id: string;
+  image: string;
+  likes: number;
+  comments: number;
+  caption: string;
+  isLiked: boolean;
+  user: {
+    id: string;
+    username: string;
+    avatar: string;
+  };
+  weight?: string;
+  sets?: string;
+  reps?: string;
+  duration?: string;
+}
+
+export default function UserPosts() {
+  const router = useRouter();
+  const { userId, postIndex } = useLocalSearchParams();
+  const flatListRef = useRef<FlatList>(null);
+  const initialIndex = parseInt(postIndex as string) || 0;
+
+  // Get posts for this user from centralized data
+  const userPostsData = getPostsByUserId(userId as string);
+  const user = getUserById(userId as string);
+
+  const [posts, setPosts] = useState<UserPost[]>(
+    userPostsData.map((post) => ({
+      id: post.id,
+      image: post.image,
+      likes: post.likes,
+      comments: post.comments,
+      caption: post.caption,
+      isLiked: false,
+      user: {
+        id: user?.id || "",
+        username: user?.username || "",
+        avatar: user?.avatar || "",
+      },
+      weight: post.weight,
+      sets: post.sets,
+      reps: post.reps,
+      duration: post.duration,
+    })),
+  );
+
+  const handleLike = (postId: string) => {
+    setPosts((prevPosts) =>
+      prevPosts.map((post) =>
+        post.id === postId
+          ? {
+              ...post,
+              isLiked: !post.isLiked,
+              likes: post.isLiked ? post.likes - 1 : post.likes + 1,
+            }
+          : post,
+      ),
+    );
+  };
+
+  useEffect(() => {
+    // Jump directly to the clicked post without animation
+    if (flatListRef.current && initialIndex > 0) {
+      // Use setTimeout to ensure FlatList has rendered
+      setTimeout(() => {
+        flatListRef.current?.scrollToIndex({
+          index: initialIndex,
+          animated: false,
+        });
+      }, 50);
+    }
+  }, [initialIndex]);
+
+  const handleUserPress = (userId: string) => {
+    router.navigate(`/user/${userId}` as any);
+  };
+
+  const renderPost = ({ item }: { item: UserPost }) => (
+    <View style={styles.postContainer}>
+      {/* Post Header */}
+      <TouchableOpacity
+        onPress={() => handleUserPress(item.user.id)}
+        style={styles.postHeader}
+      >
+        <Image source={{ uri: item.user.avatar }} style={styles.avatar} />
+        <Text style={styles.username}>{item.user.username}</Text>
+      </TouchableOpacity>
+
+      {/* Metrics */}
+      {(item.weight || item.sets || item.reps || item.duration) && (
+        <View style={styles.metricsContainer}>
+          {item.weight && (
+            <View style={styles.metricItem}>
+              <Ionicons name="barbell" size={16} color={colors.primary.main} />
+              <Text style={styles.metricText}>{item.weight}</Text>
+            </View>
+          )}
+          {item.sets && (
+            <View style={styles.metricItem}>
+              <Ionicons name="repeat" size={16} color={colors.primary.main} />
+              <Text style={styles.metricText}>{item.sets} sets</Text>
+            </View>
+          )}
+          {item.reps && (
+            <View style={styles.metricItem}>
+              <Ionicons name="fitness" size={16} color={colors.primary.main} />
+              <Text style={styles.metricText}>{item.reps} reps</Text>
+            </View>
+          )}
+          {item.duration && (
+            <View style={styles.metricItem}>
+              <Ionicons name="time" size={16} color={colors.primary.main} />
+              <Text style={styles.metricText}>{item.duration}</Text>
+            </View>
+          )}
+        </View>
+      )}
+
+      {/* Post Image */}
+      <LikeableImage
+        uri={item.image}
+        style={styles.postImage}
+        onLike={() => handleLike(item.id)}
+        isLiked={item.isLiked}
+      />
+
+      {/* Actions */}
+      <View style={styles.actionsContainer}>
+        <View style={styles.leftActions}>
+          <TouchableOpacity
+            style={styles.actionButton}
+            onPress={() => handleLike(item.id)}
+          >
+            <Ionicons
+              name={item.isLiked ? "trophy" : "trophy-outline"}
+              size={24}
+              color={item.isLiked ? "#FFD700" : colors.foreground.white}
+            />
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.actionButton}>
+            <Ionicons
+              name="chatbubble-outline"
+              size={22}
+              color={colors.foreground.white}
+            />
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.actionButton}>
+            <Ionicons
+              name="share-outline"
+              size={24}
+              color={colors.foreground.white}
+            />
+          </TouchableOpacity>
+        </View>
+      </View>
+
+      {/* Likes and Caption */}
+      <View style={styles.contentContainer}>
+        <Text style={styles.likes}>{item.likes.toLocaleString()} likes</Text>
+        <View style={styles.captionContainer}>
+          <Text style={styles.captionUsername}>{item.user.username}</Text>
+          <Text style={styles.caption}> {item.caption}</Text>
+        </View>
+        {item.comments > 0 && (
+          <Text style={styles.viewComments}>
+            View all {item.comments} comments
+          </Text>
+        )}
+      </View>
+    </View>
+  );
+
+  return (
+    <View style={styles.container}>
+      {/* Header */}
+      <View style={styles.header}>
+        <TouchableOpacity onPress={() => router.back()}>
+          <Ionicons
+            name="chevron-back"
+            size={28}
+            color={colors.foreground.white}
+          />
+        </TouchableOpacity>
+        <Text style={styles.headerTitle}>Posts</Text>
+        <View style={styles.spacer} />
+      </View>
+
+      {/* Posts List */}
+      <FlatList
+        ref={flatListRef}
+        data={posts}
+        renderItem={renderPost}
+        keyExtractor={(item) => item.id}
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={styles.listContent}
+      />
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: colors.background.dark,
+  },
+  header: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.background.darker,
+  },
+  headerTitle: {
+    fontSize: 20,
+    fontWeight: "700",
+    color: colors.foreground.white,
+  },
+  spacer: {
+    width: 28,
+  },
+  postContainer: {
+    marginBottom: 24,
+  },
+  listContent: {
+    paddingBottom: 24,
+  },
+  postHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+  },
+  avatar: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    marginRight: 12,
+  },
+  username: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: colors.foreground.white,
+  },
+  metricsContainer: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 8,
+    paddingHorizontal: 16,
+    paddingBottom: 12,
+  },
+  metricItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    backgroundColor: colors.background.darker,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 8,
+  },
+  metricText: {
+    fontSize: 12,
+    fontWeight: "600",
+    color: colors.foreground.white,
+  },
+  postImage: {
+    width: "100%",
+    height: 400,
+    backgroundColor: colors.background.darker,
+  },
+  actionsContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+  },
+  leftActions: {
+    flexDirection: "row",
+    gap: 16,
+  },
+  actionButton: {
+    padding: 4,
+  },
+  contentContainer: {
+    paddingHorizontal: 16,
+  },
+  likes: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: colors.foreground.white,
+    marginBottom: 8,
+  },
+  captionContainer: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+  },
+  captionUsername: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: colors.foreground.white,
+  },
+  caption: {
+    fontSize: 14,
+    color: colors.foreground.white,
+    lineHeight: 20,
+  },
+  viewComments: {
+    fontSize: 14,
+    color: colors.foreground.gray,
+    marginTop: 8,
+  },
+});

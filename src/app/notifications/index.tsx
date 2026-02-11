@@ -1,6 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import {
   FlatList,
   Image,
@@ -10,11 +10,13 @@ import {
   View,
 } from "react-native";
 import { colors } from "../../constants/colors";
+import { getNotificationsWithUserData } from "../../data/mockData";
 
-interface Notification {
+interface NotificationWithUser {
   id: string;
   type: "like" | "follow" | "comment" | "mention";
   user: {
+    id: string;
     username: string;
     avatar: string;
   };
@@ -24,112 +26,14 @@ interface Notification {
   isRead: boolean;
 }
 
-const MOCK_NOTIFICATIONS: Notification[] = [
-  {
-    id: "1",
-    type: "like",
-    user: {
-      username: "iron_legacy",
-      avatar: "https://i.pravatar.cc/150?img=14",
-    },
-    action: "liked your post",
-    timestamp: "5m ago",
-    postId: "5",
-    isRead: false,
-  },
-  {
-    id: "2",
-    type: "follow",
-    user: {
-      username: "gym_rat_mike",
-      avatar: "https://i.pravatar.cc/150?img=24",
-    },
-    action: "started following you",
-    timestamp: "12m ago",
-    isRead: false,
-  },
-  {
-    id: "3",
-    type: "comment",
-    user: {
-      username: "shred_mode",
-      avatar: "https://i.pravatar.cc/150?img=20",
-    },
-    action: "commented on your post",
-    timestamp: "1h ago",
-    postId: "3",
-    isRead: true,
-  },
-  {
-    id: "4",
-    type: "like",
-    user: {
-      username: "legs_for_days",
-      avatar: "https://i.pravatar.cc/150?img=18",
-    },
-    action: "liked your post",
-    timestamp: "3h ago",
-    postId: "2",
-    isRead: true,
-  },
-  {
-    id: "5",
-    type: "mention",
-    user: {
-      username: "bulk_king",
-      avatar: "https://i.pravatar.cc/150?img=22",
-    },
-    action: "mentioned you in a comment",
-    timestamp: "5h ago",
-    postId: "1",
-    isRead: true,
-  },
-  {
-    id: "6",
-    type: "follow",
-    user: {
-      username: "alex_shred",
-      avatar: "https://i.pravatar.cc/150?img=12",
-    },
-    action: "started following you",
-    timestamp: "1d ago",
-    isRead: true,
-  },
-];
-
-function getIconName(type: string): keyof typeof Ionicons.glyphMap {
-  switch (type) {
-    case "like":
-      return "heart";
-    case "follow":
-      return "person-add";
-    case "comment":
-      return "chatbubble";
-    case "mention":
-      return "at";
-    default:
-      return "notifications";
-  }
-}
-
-function getIconColor(type: string): string {
-  switch (type) {
-    case "like":
-      return "#FF6B6B";
-    case "follow":
-      return colors.primary.main;
-    case "comment":
-      return "#4ECDC4";
-    case "mention":
-      return "#FFD700";
-    default:
-      return colors.foreground.gray;
-  }
-}
-
 export default function Notifications() {
   const router = useRouter();
-  const [notifications, setNotifications] = useState(MOCK_NOTIFICATIONS);
+  const notificationsData = useMemo(
+    () => getNotificationsWithUserData() as NotificationWithUser[],
+    [],
+  );
+  const [notifications, setNotifications] =
+    useState<NotificationWithUser[]>(notificationsData);
 
   const handleMarkAsRead = (id: string) => {
     setNotifications((prev) =>
@@ -139,7 +43,37 @@ export default function Notifications() {
     );
   };
 
-  const renderNotification = ({ item }: { item: Notification }) => (
+  function getIconName(type: string): keyof typeof Ionicons.glyphMap {
+    switch (type) {
+      case "like":
+        return "heart";
+      case "follow":
+        return "person-add";
+      case "comment":
+        return "chatbubble";
+      case "mention":
+        return "at";
+      default:
+        return "notifications";
+    }
+  }
+
+  function getIconColor(type: string): string {
+    switch (type) {
+      case "like":
+        return "#FF6B6B";
+      case "follow":
+        return colors.primary.main;
+      case "comment":
+        return "#4ECDC4";
+      case "mention":
+        return "#FFD700";
+      default:
+        return colors.foreground.gray;
+    }
+  }
+
+  const renderNotification = ({ item }: { item: NotificationWithUser }) => (
     <TouchableOpacity
       style={[
         styles.notificationItem,

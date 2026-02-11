@@ -11,78 +11,12 @@ import {
     View,
 } from "react-native";
 import { colors } from "../../constants/colors";
-
-interface User {
-  id: string;
-  username: string;
-  avatar: string;
-  bio: string;
-  isFollowing: boolean;
-}
-
-const MOCK_USERS: User[] = [
-  {
-    id: "1",
-    username: "iron_legacy",
-    avatar: "https://i.pravatar.cc/150?img=14",
-    bio: "IFBB Pro | Back Specialist",
-    isFollowing: false,
-  },
-  {
-    id: "2",
-    username: "gym_rat_mike",
-    avatar: "https://i.pravatar.cc/150?img=24",
-    bio: "Fitness enthusiast | Gym lover",
-    isFollowing: true,
-  },
-  {
-    id: "3",
-    username: "shred_mode",
-    avatar: "https://i.pravatar.cc/150?img=20",
-    bio: "Shredded year-round | Cardio & Calisthenics",
-    isFollowing: false,
-  },
-  {
-    id: "4",
-    username: "legs_for_days",
-    avatar: "https://i.pravatar.cc/150?img=18",
-    bio: "Quad specialist | Transformation happened in the gym",
-    isFollowing: false,
-  },
-  {
-    id: "5",
-    username: "bulk_king",
-    avatar: "https://i.pravatar.cc/150?img=22",
-    bio: "On a mission to pack on mass | Meal prep every Sunday",
-    isFollowing: true,
-  },
-  {
-    id: "6",
-    username: "alex_shred",
-    avatar: "https://i.pravatar.cc/150?img=12",
-    bio: "NPC Competitor | Nutrition Coach",
-    isFollowing: false,
-  },
-  {
-    id: "7",
-    username: "powerlifter_pro",
-    avatar: "https://i.pravatar.cc/150?img=25",
-    bio: "Powerlifting champion 🏋️",
-    isFollowing: false,
-  },
-  {
-    id: "8",
-    username: "fit_journey",
-    avatar: "https://i.pravatar.cc/150?img=30",
-    bio: "Documenting my fitness journey",
-    isFollowing: false,
-  },
-];
+import { getAllUsers, User } from "../../data/mockData";
 
 export default function Search() {
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState("");
-  const [users, setUsers] = useState(MOCK_USERS);
+  const [users, setUsers] = useState<User[]>(getAllUsers());
 
   const filteredUsers = useMemo(() => {
     if (!searchQuery.trim()) return users;
@@ -100,29 +34,41 @@ export default function Search() {
   };
 
   const renderUserItem = ({ item }: { item: User }) => (
-    <View style={styles.userItem}>
-      <Image source={{ uri: item.avatar }} style={styles.userAvatar} />
-      <View style={styles.userInfo}>
-        <Text style={styles.username}>{item.username}</Text>
-        <Text style={styles.bio}>{item.bio}</Text>
-      </View>
-      <TouchableOpacity
-        style={[
-          styles.followButton,
-          item.isFollowing && styles.followingButton,
-        ]}
-        onPress={() => handleToggleFollow(item.id)}
-      >
-        <Text
+    <TouchableOpacity
+      style={styles.userItemContainer}
+      onPress={() => {
+        // Navigate using the dynamic route pattern
+        router.navigate(`/user/${item.id}` as any);
+      }}
+      activeOpacity={0.7}
+    >
+      <View style={styles.userItem}>
+        <Image source={{ uri: item.avatar }} style={styles.userAvatar} />
+        <View style={styles.userInfo}>
+          <Text style={styles.username}>{item.username}</Text>
+          <Text style={styles.bio}>{item.bio}</Text>
+        </View>
+        <TouchableOpacity
           style={[
-            styles.followButtonText,
-            item.isFollowing && styles.followingButtonText,
+            styles.followButton,
+            item.isFollowing && styles.followingButton,
           ]}
+          onPress={(e) => {
+            e.stopPropagation();
+            handleToggleFollow(item.id);
+          }}
         >
-          {item.isFollowing ? "Following" : "Follow"}
-        </Text>
-      </TouchableOpacity>
-    </View>
+          <Text
+            style={[
+              styles.followButtonText,
+              item.isFollowing && styles.followingButtonText,
+            ]}
+          >
+            {item.isFollowing ? "Following" : "Follow"}
+          </Text>
+        </TouchableOpacity>
+      </View>
+    </TouchableOpacity>
   );
 
   return (
@@ -235,6 +181,9 @@ const styles = StyleSheet.create({
   listContent: {
     paddingHorizontal: 12,
     paddingVertical: 8,
+  },
+  userItemContainer: {
+    marginHorizontal: 0,
   },
   userItem: {
     flexDirection: "row",
