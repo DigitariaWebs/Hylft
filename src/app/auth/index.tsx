@@ -143,7 +143,7 @@ export default function AuthLanding() {
   }, [fadeAnim]);
 
   const handleEmailSignUp = () => {
-    router.navigate("/auth/signup");
+    router.navigate("/(tabs)/home");
   };
 
   const handleGoogleSignUp = () => {

@@ -1,9 +1,12 @@
+import { Ionicons } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
 import React, { useCallback, useState } from "react";
 import {
   FlatList,
   Image,
   RefreshControl,
   StyleSheet,
+  TouchableOpacity,
   View,
 } from "react-native";
 import Post, { PostData } from "../../components/ui/Post";
@@ -130,15 +133,17 @@ function createStyles(theme: Theme) {
     },
     headerIcons: {
       flexDirection: "row",
-      gap: 16,
+      gap: 12,
+      alignItems: "center",
     },
     iconButton: {
-      padding: 4,
+      padding: 8,
     },
   });
 }
 
 export default function Home() {
+  const router = useRouter();
   const { theme } = useTheme();
   const [posts, setPosts] = useState<PostData[]>(MOCK_POSTS);
   const [refreshing, setRefreshing] = useState(false);
@@ -177,6 +182,21 @@ export default function Home() {
       {/* Header */}
       <View style={styles.header}>
         <Image source={theme.logo} style={styles.logo} resizeMode="contain" />
+        <View style={styles.headerIcons}>
+          <TouchableOpacity style={styles.iconButton}>
+            <Ionicons name="search" size={24} color={theme.foreground.gray} />
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.iconButton}
+            onPress={() => router.navigate("/notifications")}
+          >
+            <Ionicons
+              name="notifications-outline"
+              size={24}
+              color={theme.foreground.gray}
+            />
+          </TouchableOpacity>
+        </View>
       </View>
 
       {/* Posts Feed */}
