@@ -38,6 +38,27 @@ export interface Notification {
   isRead: boolean;
 }
 
+export interface Reply {
+  id: string;
+  commentId: string;
+  userId: string;
+  text: string;
+  timestamp: string;
+  likes: number;
+  isLiked: boolean;
+}
+
+export interface Comment {
+  id: string;
+  postId: string;
+  userId: string;
+  text: string;
+  timestamp: string;
+  likes: number;
+  isLiked: boolean;
+  replies?: Reply[];
+}
+
 // ============================================
 // USERS DATA
 // ============================================
@@ -342,6 +363,203 @@ export const NOTIFICATIONS: Notification[] = [
 ];
 
 // ============================================
+// COMMENTS DATA
+// ============================================
+export const COMMENTS: Comment[] = [
+  // Post 1 comments
+  {
+    id: "c1",
+    postId: "1",
+    userId: "2",
+    text: "Bro those numbers are insane! 💪 What's your training split looking like?",
+    timestamp: "2h ago",
+    likes: 15,
+    isLiked: false,
+    replies: [
+      {
+        id: "r1",
+        commentId: "c1",
+        userId: "1",
+        text: "Push/pull/legs split! Been working great for me 🔥",
+        timestamp: "1h ago",
+        likes: 5,
+        isLiked: false,
+      },
+      {
+        id: "r2",
+        commentId: "c1",
+        userId: "2",
+        text: "That's solid bro! Gonna give it a try",
+        timestamp: "45m ago",
+        likes: 2,
+        isLiked: false,
+      },
+    ],
+  },
+  {
+    id: "c2",
+    postId: "1",
+    userId: "4",
+    text: "Chest day is the best day! Keep crushing it 🔥",
+    timestamp: "2h ago",
+    likes: 8,
+    isLiked: true,
+    replies: [
+      {
+        id: "r3",
+        commentId: "c2",
+        userId: "1",
+        text: "Chest and tris is my favorite combo!",
+        timestamp: "1h ago",
+        likes: 3,
+        isLiked: true,
+      },
+    ],
+  },
+  {
+    id: "c3",
+    postId: "1",
+    userId: "5",
+    text: "315 for reps is no joke! Respect 🙌",
+    timestamp: "1h ago",
+    likes: 12,
+    isLiked: false,
+  },
+  // Post 2 comments
+  {
+    id: "c4",
+    postId: "2",
+    userId: "1",
+    text: "Back workouts hit different! Your form is perfect 👌",
+    timestamp: "4h ago",
+    likes: 22,
+    isLiked: false,
+  },
+  {
+    id: "c5",
+    postId: "2",
+    userId: "3",
+    text: "22 inch arms?! That's legendary status bro 💯",
+    timestamp: "3h ago",
+    likes: 34,
+    isLiked: true,
+    replies: [
+      {
+        id: "r4",
+        commentId: "c5",
+        userId: "2",
+        text: "Took years of dedicated arm work but worth it!",
+        timestamp: "2h ago",
+        likes: 8,
+        isLiked: false,
+      },
+      {
+        id: "r5",
+        commentId: "c5",
+        userId: "3",
+        text: "What exercises do you recommend?",
+        timestamp: "1h ago",
+        likes: 1,
+        isLiked: false,
+      },
+      {
+        id: "r6",
+        commentId: "c5",
+        userId: "2",
+        text: "Barbell curls, cable curls, and close grip benches!",
+        timestamp: "30m ago",
+        likes: 4,
+        isLiked: false,
+      },
+    ],
+  },
+  {
+    id: "c6",
+    postId: "2",
+    userId: "5",
+    text: "Can you share your back routine? Need to add some width",
+    timestamp: "2h ago",
+    likes: 18,
+    isLiked: false,
+  },
+  {
+    id: "c7",
+    postId: "2",
+    userId: "4",
+    text: "405 lbs rowing?! Absolute unit 🔥",
+    timestamp: "1h ago",
+    likes: 25,
+    isLiked: false,
+  },
+  // Post 3 comments
+  {
+    id: "c8",
+    postId: "3",
+    userId: "2",
+    text: "Leg day = best day! Those quads are looking massive 🦵",
+    timestamp: "5h ago",
+    likes: 19,
+    isLiked: false,
+  },
+  {
+    id: "c9",
+    postId: "3",
+    userId: "1",
+    text: "765 lbs? That's superhuman strength! 💪",
+    timestamp: "4h ago",
+    likes: 28,
+    isLiked: true,
+  },
+  // Post 4 comments
+  {
+    id: "c10",
+    postId: "4",
+    userId: "2",
+    text: "Those delts are looking 3D already! Stage ready 🏆",
+    timestamp: "6h ago",
+    likes: 31,
+    isLiked: false,
+  },
+  {
+    id: "c11",
+    postId: "4",
+    userId: "5",
+    text: "Dropsets for shoulders are brutal but so effective!",
+    timestamp: "5h ago",
+    likes: 14,
+    isLiked: false,
+  },
+  {
+    id: "c12",
+    postId: "4",
+    userId: "1",
+    text: "Your shoulder development is goals! What's the secret?",
+    timestamp: "4h ago",
+    likes: 21,
+    isLiked: true,
+  },
+  // Post 5 comments
+  {
+    id: "c13",
+    postId: "5",
+    userId: "3",
+    text: "5500 calories?! Living the dream 😅🍗",
+    timestamp: "7h ago",
+    likes: 42,
+    isLiked: true,
+  },
+  {
+    id: "c14",
+    postId: "5",
+    userId: "4",
+    text: "Bulk season is the best season! Enjoy those gains",
+    timestamp: "6h ago",
+    likes: 16,
+    isLiked: false,
+  },
+];
+
+// ============================================
 // HELPER FUNCTIONS
 // ============================================
 
@@ -390,6 +608,27 @@ export function getNotificationsWithUserData() {
   return NOTIFICATIONS.map((notification) => ({
     ...notification,
     user: USERS[notification.userId],
+  }));
+}
+
+/**
+ * Get comments for a specific post
+ */
+export function getCommentsByPostId(postId: string): Comment[] {
+  return COMMENTS.filter((comment) => comment.postId === postId);
+}
+
+/**
+ * Get comments with populated user data
+ */
+export function getCommentsWithUserData(postId: string) {
+  return getCommentsByPostId(postId).map((comment) => ({
+    ...comment,
+    user: USERS[comment.userId],
+    replies: (comment.replies || []).map((reply) => ({
+      ...reply,
+      user: USERS[reply.userId],
+    })),
   }));
 }
 

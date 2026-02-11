@@ -64,6 +64,10 @@ const Post = memo(
       setIsSaved(!isSaved);
     };
 
+    const handleComments = () => {
+      router.navigate(`/comments/${post.id}` as any);
+    };
+
     const styles = createStyles(theme);
 
     return (
@@ -132,10 +136,15 @@ const Post = memo(
               <Ionicons
                 name={post.isLiked ? "trophy" : "trophy-outline"}
                 size={28}
-                color={post.isLiked ? "#FFD700" : theme.foreground.white}
+                color={
+                  post.isLiked ? theme.primary.main : theme.foreground.white
+                }
               />
             </TouchableOpacity>
-            <TouchableOpacity style={styles.actionButton}>
+            <TouchableOpacity
+              onPress={handleComments}
+              style={styles.actionButton}
+            >
               <Ionicons
                 name="chatbubble-outline"
                 size={26}
@@ -167,7 +176,7 @@ const Post = memo(
             {post.caption}
           </Text>
           {post.comments > 0 && (
-            <TouchableOpacity>
+            <TouchableOpacity onPress={handleComments}>
               <Text style={styles.viewComments}>
                 View all {post.comments} comments
               </Text>

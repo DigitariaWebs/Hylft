@@ -12,20 +12,13 @@ import {
 import { useTheme } from "../../contexts/ThemeContext";
 import { getUserProfile } from "../../data/mockData";
 
-interface UserPost {
-  id: string;
-  image: string;
-  likes: number;
-  comments: number;
-  caption: string;
-}
-
 export default function UserProfile() {
   const router = useRouter();
   const { id } = useLocalSearchParams();
   const { theme } = useTheme();
   const userProfileData = getUserProfile(id as string);
   const styles = createStyles(theme);
+  const [isFollowing, setIsFollowing] = useState(userProfileData?.isFollowing || false);
 
   if (!userProfileData) {
     return (
@@ -35,33 +28,9 @@ export default function UserProfile() {
     );
   }
 
-  const [isFollowing, setIsFollowing] = useState(userProfileData.isFollowing);
-
   const handleToggleFollow = () => {
     setIsFollowing(!isFollowing);
   };
-
-  const renderPost = ({ item }: { item: UserPost }) => (
-    <TouchableOpacity style={styles.postItem}>
-      <Image source={{ uri: item.image }} style={styles.postImage} />
-      <View style={styles.postOverlay}>
-        <View style={styles.postStats}>
-          <View style={styles.stat}>
-            <Ionicons name="heart" size={16} color={theme.foreground.white} />
-            <Text style={styles.statText}>{item.likes}</Text>
-          </View>
-          <View style={styles.stat}>
-            <Ionicons
-              name="chatbubble"
-              size={16}
-              color={theme.foreground.white}
-            />
-            <Text style={styles.statText}>{item.comments}</Text>
-          </View>
-        </View>
-      </View>
-    </TouchableOpacity>
-  );
 
   return (
     <View style={styles.container}>
@@ -166,7 +135,7 @@ export default function UserProfile() {
             />
             <Text style={styles.emptyTitle}>No posts yet</Text>
             <Text style={styles.emptySubtitle}>
-              This user hasn't shared any posts
+              This user hasn&apos;t shared any posts
             </Text>
           </View>
         ) : (
@@ -398,4 +367,3 @@ const createStyles = (theme: ReturnType<typeof useTheme>["theme"]) =>
     },
   });
 
-const styles = StyleSheet.create({});

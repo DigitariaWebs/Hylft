@@ -156,7 +156,10 @@ export default function UserPosts() {
               color={item.isLiked ? theme.primary.main : theme.foreground.white}
             />
           </TouchableOpacity>
-          <TouchableOpacity style={styles.actionButton}>
+          <TouchableOpacity
+            style={styles.actionButton}
+            onPress={() => router.navigate(`/comments/${item.id}` as any)}
+          >
             <Ionicons
               name="chatbubble-outline"
               size={22}
@@ -181,9 +184,13 @@ export default function UserPosts() {
           <Text style={styles.caption}> {item.caption}</Text>
         </View>
         {item.comments > 0 && (
-          <Text style={styles.viewComments}>
-            View all {item.comments} comments
-          </Text>
+          <TouchableOpacity
+            onPress={() => router.navigate(`/comments/${item.id}` as any)}
+          >
+            <Text style={styles.viewComments}>
+              View all {item.comments} comments
+            </Text>
+          </TouchableOpacity>
         )}
       </View>
     </View>
@@ -332,5 +339,3 @@ const createStyles = (theme: ReturnType<typeof useTheme>["theme"]) =>
       marginTop: 8,
     },
   });
-
-const styles = StyleSheet.create({});

@@ -267,4 +267,4 @@ const createStyles = (theme: ReturnType<typeof useTheme>["theme"]) =>
     },
   });
 
-const styles = StyleSheet.create({});
+

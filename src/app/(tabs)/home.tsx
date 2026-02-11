@@ -58,7 +58,7 @@ export default function Home() {
   const router = useRouter();
   const { theme } = useTheme();
   const [refreshing, setRefreshing] = useState(false);
-  const [unreadCount, setUnreadCount] = useState(3); // Example: 3 unread messages
+  const [unreadCount] = useState(3); // Example: 3 unread messages
 
   // Initialize posts with like state
   const [posts, setPosts] = useState<PostData[]>(
