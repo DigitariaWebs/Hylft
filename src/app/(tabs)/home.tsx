@@ -40,6 +40,16 @@ function createStyles(theme: Theme) {
     },
     iconButton: {
       padding: 8,
+      position: "relative",
+    },
+    notificationBadge: {
+      position: "absolute",
+      top: 8,
+      right: 8,
+      width: 10,
+      height: 10,
+      borderRadius: 5,
+      backgroundColor: theme.primary.main,
     },
   });
 }
@@ -48,6 +58,7 @@ export default function Home() {
   const router = useRouter();
   const { theme } = useTheme();
   const [refreshing, setRefreshing] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(3); // Example: 3 unread messages
 
   // Initialize posts with like state
   const [posts, setPosts] = useState<PostData[]>(
@@ -60,7 +71,7 @@ export default function Home() {
           avatar: post.user.avatar,
           bio: post.user.bio,
         },
-        image: post.image,
+        images: post.images,
         likes: post.likes,
         caption: post.caption,
         comments: post.comments,
@@ -123,6 +134,7 @@ export default function Home() {
               size={24}
               color={theme.foreground.gray}
             />
+            {unreadCount > 0 && <View style={styles.notificationBadge} />}
           </TouchableOpacity>
         </View>
       </View>

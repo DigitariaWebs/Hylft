@@ -15,7 +15,7 @@ export interface User {
 export interface Post {
   id: string;
   userId: string;
-  image: string;
+  images: string[]; // Support multiple images (1-4)
   likes: number;
   caption: string;
   comments: number;
@@ -139,7 +139,11 @@ export const POSTS: Post[] = [
   {
     id: "1",
     userId: "1",
-    image: "https://images.unsplash.com/photo-1583454110551-21f2fa2afe61?w=800",
+    images: [
+      "https://images.unsplash.com/photo-1583454110551-21f2fa2afe61?w=800",
+      "https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?w=800",
+      "https://images.unsplash.com/photo-1605296867424-35fc25c9212a?w=800",
+    ],
     likes: 1240,
     caption:
       "Heavy chest day! Feeling the mind-muscle connection 🔥 This volume is insane, 3 more weeks into my competition prep!",
@@ -154,7 +158,10 @@ export const POSTS: Post[] = [
   {
     id: "2",
     userId: "2",
-    image: "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=800",
+    images: [
+      "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=800",
+      "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=800",
+    ],
     likes: 2156,
     caption:
       "Back and biceps pump! Rows are the foundation of a massive back. 🦾 Current stats: 22 inch arms pumped",
@@ -169,7 +176,9 @@ export const POSTS: Post[] = [
   {
     id: "3",
     userId: "4",
-    image: "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=800",
+    images: [
+      "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=800",
+    ],
     likes: 1876,
     caption:
       "Quad day 🔥 Progressive overload at its finest! These wheels are growing like crazy during this bulk phase",
@@ -184,7 +193,12 @@ export const POSTS: Post[] = [
   {
     id: "4",
     userId: "3",
-    image: "https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=800",
+    images: [
+      "https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=800",
+      "https://images.unsplash.com/photo-1574680096145-d05b474e2155?w=800",
+      "https://images.unsplash.com/photo-1576678927484-cc907957088c?w=800",
+      "https://images.unsplash.com/photo-1583454110551-21f2fa2afe61?w=800",
+    ],
     likes: 2543,
     caption:
       "Dropset delts 💥 This shoulder workout left me DESTROYED! Striving for that round, 3D shoulder look for stage",
@@ -199,7 +213,10 @@ export const POSTS: Post[] = [
   {
     id: "5",
     userId: "5",
-    image: "https://images.unsplash.com/photo-1476480862126-209bfaa8edc8?w=800",
+    images: [
+      "https://images.unsplash.com/photo-1476480862126-209bfaa8edc8?w=800",
+      "https://images.unsplash.com/photo-1593476123561-9516f2097158?w=800",
+    ],
     likes: 1654,
     caption:
       "Consuming 5500 calories today 🍗 Bulking season is HERE! Focusing on heavy compound movements and progressive overload. Goal: 225 lbs at 8% bodyfat",
@@ -214,7 +231,9 @@ export const POSTS: Post[] = [
   {
     id: "6",
     userId: "1",
-    image: "https://images.unsplash.com/photo-1526506118085-60ce8714f8c5?w=800",
+    images: [
+      "https://images.unsplash.com/photo-1526506118085-60ce8714f8c5?w=800",
+    ],
     likes: 987,
     caption:
       "Arm day pump achieved! 💪 Biceps and triceps superset warfare. These gains aren't gonna make themselves!",
@@ -229,7 +248,11 @@ export const POSTS: Post[] = [
   {
     id: "7",
     userId: "3",
-    image: "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=800",
+    images: [
+      "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=800",
+      "https://images.unsplash.com/photo-1571902943202-507ec2618e8f?w=800",
+      "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=800",
+    ],
     likes: 1876,
     caption:
       "Back and biceps pump day 🦾 Rows are the foundation of a massive back. Current stats: 22 inch arms pumped",
@@ -244,7 +267,9 @@ export const POSTS: Post[] = [
   {
     id: "8",
     userId: "3",
-    image: "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=800",
+    images: [
+      "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=800",
+    ],
     likes: 1654,
     caption:
       "Leg day never skipped 🔥 Quad day! Progressive overload at its finest! These wheels are growing like crazy during this bulk phase",
@@ -381,7 +406,7 @@ export function getUserProfile(userId: string) {
     ...user,
     posts_data: userPosts.map((post) => ({
       id: post.id,
-      image: post.image,
+      images: post.images,
       likes: post.likes,
       comments: post.comments,
       caption: post.caption,

@@ -9,7 +9,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { colors } from "../../constants/colors";
+import { useTheme } from "../../contexts/ThemeContext";
 import { getUserProfile } from "../../data/mockData";
 
 interface UserPost {
@@ -23,12 +23,14 @@ interface UserPost {
 export default function UserProfile() {
   const router = useRouter();
   const { id } = useLocalSearchParams();
+  const { theme } = useTheme();
   const userProfileData = getUserProfile(id as string);
+  const styles = createStyles(theme);
 
   if (!userProfileData) {
     return (
       <View style={styles.container}>
-        <Text style={{ color: colors.foreground.white }}>User not found</Text>
+        <Text style={{ color: theme.foreground.white }}>User not found</Text>
       </View>
     );
   }
@@ -45,14 +47,14 @@ export default function UserProfile() {
       <View style={styles.postOverlay}>
         <View style={styles.postStats}>
           <View style={styles.stat}>
-            <Ionicons name="heart" size={16} color={colors.foreground.white} />
+            <Ionicons name="heart" size={16} color={theme.foreground.white} />
             <Text style={styles.statText}>{item.likes}</Text>
           </View>
           <View style={styles.stat}>
             <Ionicons
               name="chatbubble"
               size={16}
-              color={colors.foreground.white}
+              color={theme.foreground.white}
             />
             <Text style={styles.statText}>{item.comments}</Text>
           </View>
@@ -69,7 +71,7 @@ export default function UserProfile() {
           <Ionicons
             name="chevron-back"
             size={28}
-            color={colors.foreground.white}
+            color={theme.foreground.white}
           />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>{userProfileData.username}</Text>
@@ -94,7 +96,7 @@ export default function UserProfile() {
                 <Ionicons
                   name="lock-closed"
                   size={16}
-                  color={colors.foreground.gray}
+                  color={theme.foreground.gray}
                   style={styles.lockIcon}
                 />
               )}
@@ -148,7 +150,7 @@ export default function UserProfile() {
             <Ionicons
               name="lock-closed"
               size={64}
-              color={colors.foreground.gray}
+              color={theme.foreground.gray}
             />
             <Text style={styles.privateTitle}>This account is private</Text>
             <Text style={styles.privateSubtitle}>
@@ -160,7 +162,7 @@ export default function UserProfile() {
             <Ionicons
               name="image-outline"
               size={64}
-              color={colors.foreground.gray}
+              color={theme.foreground.gray}
             />
             <Text style={styles.emptyTitle}>No posts yet</Text>
             <Text style={styles.emptySubtitle}>
@@ -182,7 +184,7 @@ export default function UserProfile() {
                   }
                 >
                   <Image
-                    source={{ uri: post.image }}
+                    source={{ uri: post.images[0] }}
                     style={styles.gridImage}
                   />
                 </TouchableOpacity>
@@ -195,202 +197,205 @@ export default function UserProfile() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background.dark,
-  },
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.background.darker,
-  },
-  headerTitle: {
-    fontSize: 20,
-    fontWeight: "700",
-    color: colors.foreground.white,
-  },
-  spacer: {
-    width: 28,
-  },
-  content: {
-    flex: 1,
-  },
-  scrollContent: {
-    paddingBottom: 24,
-  },
-  profileHeader: {
-    flexDirection: "row",
-    alignItems: "flex-start",
-    paddingHorizontal: 16,
-    paddingVertical: 16,
-  },
-  avatar: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    marginRight: 16,
-  },
-  profileInfo: {
-    flex: 1,
-  },
-  nameContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 4,
-  },
-  username: {
-    fontSize: 18,
-    fontWeight: "700",
-    color: colors.foreground.white,
-  },
-  lockIcon: {
-    marginLeft: 8,
-  },
-  bio: {
-    fontSize: 13,
-    color: colors.foreground.gray,
-    marginBottom: 8,
-  },
-  statsContainer: {
-    flexDirection: "row",
-    justifyContent: "space-around",
-    paddingHorizontal: 16,
-    marginBottom: 20,
-  },
-  statBox: {
-    alignItems: "center",
-  },
-  statNumber: {
-    fontSize: 18,
-    fontWeight: "700",
-    color: colors.foreground.white,
-  },
-  statLabel: {
-    fontSize: 12,
-    color: colors.foreground.gray,
-    marginTop: 4,
-  },
-  followButton: {
-    marginHorizontal: 16,
-    paddingVertical: 12,
-    borderRadius: 8,
-    backgroundColor: colors.primary.main,
-    alignItems: "center",
-    marginBottom: 24,
-  },
-  followingButton: {
-    backgroundColor: colors.background.accent,
-    borderWidth: 1,
-    borderColor: colors.primary.main,
-  },
-  followButtonText: {
-    fontSize: 14,
-    fontWeight: "600",
-    color: colors.background.dark,
-  },
-  followingButtonText: {
-    color: colors.primary.main,
-  },
-  privateContainer: {
-    alignItems: "center",
-    paddingVertical: 60,
-  },
-  privateTitle: {
-    fontSize: 18,
-    fontWeight: "600",
-    color: colors.foreground.white,
-    marginTop: 16,
-    marginBottom: 8,
-  },
-  privateSubtitle: {
-    fontSize: 14,
-    color: colors.foreground.gray,
-    textAlign: "center",
-    paddingHorizontal: 32,
-  },
-  emptyState: {
-    alignItems: "center",
-    paddingVertical: 60,
-  },
-  emptyTitle: {
-    fontSize: 18,
-    fontWeight: "600",
-    color: colors.foreground.white,
-    marginTop: 16,
-    marginBottom: 8,
-  },
-  emptySubtitle: {
-    fontSize: 14,
-    color: colors.foreground.gray,
-    textAlign: "center",
-    paddingHorizontal: 32,
-  },
-  postsSection: {
-    paddingHorizontal: 16,
-  },
-  postsTitle: {
-    fontSize: 16,
-    fontWeight: "700",
-    color: colors.foreground.white,
-    marginBottom: 12,
-  },
-  postsGrid: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: 4,
-  },
-  gridItem: {
-    width: "32%",
-    aspectRatio: 1,
-    borderRadius: 8,
-    overflow: "hidden",
-  },
-  gridImage: {
-    width: "100%",
-    height: "100%",
-  },
-  postItem: {
-    marginHorizontal: 16,
-    marginBottom: 16,
-    borderRadius: 12,
-    overflow: "hidden",
-    height: 300,
-  },
-  postImage: {
-    width: "100%",
-    height: "100%",
-  },
-  postOverlay: {
-    position: "absolute",
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: "rgba(0, 0, 0, 0.3)",
-    justifyContent: "flex-end",
-    padding: 16,
-  },
-  postStats: {
-    flexDirection: "row",
-    gap: 16,
-  },
-  stat: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 8,
-    backgroundColor: "rgba(0, 0, 0, 0.6)",
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderRadius: 8,
-  },
-  statText: {
-    fontSize: 14,
-    fontWeight: "600",
-    color: colors.foreground.white,
-  },
-});
+const createStyles = (theme: ReturnType<typeof useTheme>["theme"]) =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: theme.background.dark,
+    },
+    header: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+      paddingHorizontal: 16,
+      paddingVertical: 12,
+      borderBottomWidth: 1,
+      borderBottomColor: theme.background.darker,
+    },
+    headerTitle: {
+      fontSize: 20,
+      fontWeight: "700",
+      color: theme.foreground.white,
+    },
+    spacer: {
+      width: 28,
+    },
+    content: {
+      flex: 1,
+    },
+    scrollContent: {
+      paddingBottom: 24,
+    },
+    profileHeader: {
+      flexDirection: "row",
+      alignItems: "flex-start",
+      paddingHorizontal: 16,
+      paddingVertical: 16,
+    },
+    avatar: {
+      width: 80,
+      height: 80,
+      borderRadius: 40,
+      marginRight: 16,
+    },
+    profileInfo: {
+      flex: 1,
+    },
+    nameContainer: {
+      flexDirection: "row",
+      alignItems: "center",
+      marginBottom: 4,
+    },
+    username: {
+      fontSize: 18,
+      fontWeight: "700",
+      color: theme.foreground.white,
+    },
+    lockIcon: {
+      marginLeft: 8,
+    },
+    bio: {
+      fontSize: 13,
+      color: theme.foreground.gray,
+      marginBottom: 8,
+    },
+    statsContainer: {
+      flexDirection: "row",
+      justifyContent: "space-around",
+      paddingHorizontal: 16,
+      marginBottom: 20,
+    },
+    statBox: {
+      alignItems: "center",
+    },
+    statNumber: {
+      fontSize: 18,
+      fontWeight: "700",
+      color: theme.foreground.white,
+    },
+    statLabel: {
+      fontSize: 12,
+      color: theme.foreground.gray,
+      marginTop: 4,
+    },
+    followButton: {
+      marginHorizontal: 16,
+      paddingVertical: 12,
+      borderRadius: 8,
+      backgroundColor: theme.primary.main,
+      alignItems: "center",
+      marginBottom: 24,
+    },
+    followingButton: {
+      backgroundColor: theme.background.accent,
+      borderWidth: 1,
+      borderColor: theme.primary.main,
+    },
+    followButtonText: {
+      fontSize: 14,
+      fontWeight: "600",
+      color: theme.background.dark,
+    },
+    followingButtonText: {
+      color: theme.primary.main,
+    },
+    privateContainer: {
+      alignItems: "center",
+      paddingVertical: 60,
+    },
+    privateTitle: {
+      fontSize: 18,
+      fontWeight: "600",
+      color: theme.foreground.white,
+      marginTop: 16,
+      marginBottom: 8,
+    },
+    privateSubtitle: {
+      fontSize: 14,
+      color: theme.foreground.gray,
+      textAlign: "center",
+      paddingHorizontal: 32,
+    },
+    emptyState: {
+      alignItems: "center",
+      paddingVertical: 60,
+    },
+    emptyTitle: {
+      fontSize: 18,
+      fontWeight: "600",
+      color: theme.foreground.white,
+      marginTop: 16,
+      marginBottom: 8,
+    },
+    emptySubtitle: {
+      fontSize: 14,
+      color: theme.foreground.gray,
+      textAlign: "center",
+      paddingHorizontal: 32,
+    },
+    postsSection: {
+      paddingHorizontal: 16,
+    },
+    postsTitle: {
+      fontSize: 16,
+      fontWeight: "700",
+      color: theme.foreground.white,
+      marginBottom: 12,
+    },
+    postsGrid: {
+      flexDirection: "row",
+      flexWrap: "wrap",
+      gap: 4,
+    },
+    gridItem: {
+      width: "32%",
+      aspectRatio: 1,
+      borderRadius: 8,
+      overflow: "hidden",
+    },
+    gridImage: {
+      width: "100%",
+      height: "100%",
+    },
+    postItem: {
+      marginHorizontal: 16,
+      marginBottom: 16,
+      borderRadius: 12,
+      overflow: "hidden",
+      height: 300,
+    },
+    postImage: {
+      width: "100%",
+      height: "100%",
+    },
+    postOverlay: {
+      position: "absolute",
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      backgroundColor: "rgba(0, 0, 0, 0.3)",
+      justifyContent: "flex-end",
+      padding: 16,
+    },
+    postStats: {
+      flexDirection: "row",
+      gap: 16,
+    },
+    stat: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 8,
+      backgroundColor: "rgba(0, 0, 0, 0.6)",
+      paddingHorizontal: 12,
+      paddingVertical: 8,
+      borderRadius: 8,
+    },
+    statText: {
+      fontSize: 14,
+      fontWeight: "600",
+      color: theme.foreground.white,
+    },
+  });
+
+const styles = StyleSheet.create({});

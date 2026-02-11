@@ -11,7 +11,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { colors } from "../constants/colors";
+import { useTheme } from "../contexts/ThemeContext";
 import { auth } from "../utils/auth";
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get("window");
@@ -52,6 +52,8 @@ export default function OnBoarding() {
   const [currentPage, setCurrentPage] = useState(0);
   const scrollViewRef = useRef<ScrollView>(null);
   const router = useRouter();
+  const { theme } = useTheme();
+  const styles = createStyles(theme);
 
   const handleScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
     const offsetX = event.nativeEvent.contentOffset.x;
@@ -161,105 +163,108 @@ export default function OnBoarding() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background.dark,
-  },
-  logoContainer: {
-    position: "absolute",
-    top: 60,
-    left: 20,
-    zIndex: 10,
-  },
-  logo: {
-    width: 120,
-    height: 40,
-  },
-  scrollView: {
-    flex: 1,
-  },
-  page: {
-    width: SCREEN_WIDTH,
-    flex: 1,
-  },
-  imageContainer: {
-    height: SCREEN_HEIGHT,
-    position: "relative",
-  },
-  image: {
-    width: "100%",
-    height: "100%",
-  },
-  imageOverlay: {
-    position: "absolute",
-    bottom: 0,
-    left: 0,
-    right: 0,
-    top: 0,
-    backgroundColor: colors.background.dark,
-    opacity: 0.7,
-  },
-  contentContainer: {
-    position: "absolute",
-    bottom: 200,
-    left: 0,
-    right: 0,
-    paddingHorizontal: 32,
-    alignItems: "flex-start",
-  },
-  title: {
-    fontSize: 32,
-    fontWeight: "normal",
-    color: colors.foreground.white,
-    marginBottom: 16,
-    lineHeight: 30,
-    textAlign: "left",
-  },
-  titleContainer: {
-    alignItems: "flex-start",
-    marginBottom: 16,
-  },
-  titleBold: {
-    fontSize: 54,
-    fontWeight: "bold",
-    color: colors.primary.main,
-    lineHeight: 65,
-  },
-  subtitle: {
-    fontSize: 15,
-    color: colors.foreground.gray,
-    lineHeight: 24,
-    textAlign: "left",
-  },
-  buttonContainer: {
-    position: "absolute",
-    bottom: 48,
-    left: 0,
-    right: 0,
-    paddingHorizontal: 32,
-  },
-  primaryButton: {
-    backgroundColor: colors.primary.main,
-    paddingVertical: 18,
-    borderRadius: 12,
-    alignItems: "center",
-    justifyContent: "center",
-    marginBottom: 16,
-  },
-  primaryButtonText: {
-    color: colors.background.dark,
-    fontSize: 18,
-    fontWeight: "bold",
-  },
-  skipButton: {
-    paddingVertical: 12,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  skipButtonText: {
-    color: colors.foreground.gray,
-    fontSize: 16,
-    fontWeight: "600",
-  },
-});
+const createStyles = (theme: ReturnType<typeof useTheme>["theme"]) =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: theme.background.dark,
+    },
+    logoContainer: {
+      position: "absolute",
+      top: 60,
+      left: 20,
+      zIndex: 10,
+    },
+    logo: {
+      width: 120,
+      height: 40,
+    },
+    scrollView: {
+      flex: 1,
+    },
+    page: {
+      width: SCREEN_WIDTH,
+      flex: 1,
+    },
+    imageContainer: {
+      height: SCREEN_HEIGHT,
+      position: "relative",
+    },
+    image: {
+      width: "100%",
+      height: "100%",
+    },
+    imageOverlay: {
+      position: "absolute",
+      bottom: 0,
+      left: 0,
+      right: 0,
+      top: 0,
+      backgroundColor: theme.background.dark,
+      opacity: 0.7,
+    },
+    contentContainer: {
+      position: "absolute",
+      bottom: 200,
+      left: 0,
+      right: 0,
+      paddingHorizontal: 32,
+      alignItems: "flex-start",
+    },
+    title: {
+      fontSize: 32,
+      fontWeight: "normal",
+      color: theme.foreground.white,
+      marginBottom: 16,
+      lineHeight: 30,
+      textAlign: "left",
+    },
+    titleContainer: {
+      alignItems: "flex-start",
+      marginBottom: 16,
+    },
+    titleBold: {
+      fontSize: 54,
+      fontWeight: "bold",
+      color: theme.primary.main,
+      lineHeight: 65,
+    },
+    subtitle: {
+      fontSize: 15,
+      color: theme.foreground.gray,
+      lineHeight: 24,
+      textAlign: "left",
+    },
+    buttonContainer: {
+      position: "absolute",
+      bottom: 48,
+      left: 0,
+      right: 0,
+      paddingHorizontal: 32,
+    },
+    primaryButton: {
+      backgroundColor: theme.primary.main,
+      paddingVertical: 18,
+      borderRadius: 12,
+      alignItems: "center",
+      justifyContent: "center",
+      marginBottom: 16,
+    },
+    primaryButtonText: {
+      color: theme.background.dark,
+      fontSize: 18,
+      fontWeight: "bold",
+    },
+    skipButton: {
+      paddingVertical: 12,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    skipButtonText: {
+      color: theme.foreground.gray,
+      fontSize: 16,
+      fontWeight: "600",
+    },
+  });
+
+const styles = StyleSheet.create({});

@@ -2,19 +2,21 @@ import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import React, { useMemo, useState } from "react";
 import {
-    FlatList,
-    Image,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  FlatList,
+  Image,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from "react-native";
-import { colors } from "../../constants/colors";
+import { useTheme } from "../../contexts/ThemeContext";
 import { getAllUsers, User } from "../../data/mockData";
 
 export default function Search() {
   const router = useRouter();
+  const { theme } = useTheme();
+  const styles = createStyles(theme);
   const [searchQuery, setSearchQuery] = useState("");
   const [users, setUsers] = useState<User[]>(getAllUsers());
 
@@ -79,7 +81,7 @@ export default function Search() {
           <Ionicons
             name="chevron-back"
             size={28}
-            color={colors.foreground.white}
+            color={theme.foreground.white}
           />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Find People</Text>
@@ -91,13 +93,13 @@ export default function Search() {
         <Ionicons
           name="search"
           size={20}
-          color={colors.foreground.gray}
+          color={theme.foreground.gray}
           style={styles.searchIcon}
         />
         <TextInput
           style={styles.searchInput}
           placeholder="Search people..."
-          placeholderTextColor={colors.foreground.gray}
+          placeholderTextColor={theme.foreground.gray}
           value={searchQuery}
           onChangeText={setSearchQuery}
         />
@@ -106,7 +108,7 @@ export default function Search() {
             <Ionicons
               name="close-circle"
               size={20}
-              color={colors.foreground.gray}
+              color={theme.foreground.gray}
             />
           </TouchableOpacity>
         )}
@@ -126,7 +128,7 @@ export default function Search() {
           <Ionicons
             name="search-outline"
             size={48}
-            color={colors.foreground.gray}
+            color={theme.foreground.gray}
           />
           <Text style={styles.emptyText}>No users found</Text>
           <Text style={styles.emptySubtext}>
@@ -138,116 +140,119 @@ export default function Search() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background.dark,
-  },
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.background.darker,
-  },
-  headerTitle: {
-    fontSize: 24,
-    fontWeight: "700",
-    color: colors.foreground.white,
-  },
-  spacer: {
-    width: 28,
-  },
-  searchContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginHorizontal: 16,
-    marginVertical: 12,
-    paddingHorizontal: 12,
-    borderRadius: 12,
-    backgroundColor: colors.background.darker,
-  },
-  searchIcon: {
-    marginRight: 8,
-  },
-  searchInput: {
-    flex: 1,
-    paddingVertical: 12,
-    color: colors.foreground.white,
-    fontSize: 14,
-  },
-  listContent: {
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-  },
-  userItemContainer: {
-    marginHorizontal: 0,
-  },
-  userItem: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingHorizontal: 12,
-    paddingVertical: 12,
-    marginVertical: 6,
-    borderRadius: 12,
-    backgroundColor: colors.background.darker,
-  },
-  userAvatar: {
-    width: 52,
-    height: 52,
-    borderRadius: 26,
-    marginRight: 12,
-  },
-  userInfo: {
-    flex: 1,
-  },
-  username: {
-    fontSize: 14,
-    fontWeight: "600",
-    color: colors.foreground.white,
-    marginBottom: 4,
-  },
-  bio: {
-    fontSize: 12,
-    color: colors.foreground.gray,
-  },
-  followButton: {
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 8,
-    backgroundColor: colors.primary.main,
-  },
-  followingButton: {
-    backgroundColor: colors.background.accent,
-    borderWidth: 1,
-    borderColor: colors.primary.main,
-  },
-  followButtonText: {
-    fontSize: 12,
-    fontWeight: "600",
-    color: colors.background.dark,
-  },
-  followingButtonText: {
-    color: colors.primary.main,
-  },
-  emptyState: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    paddingHorizontal: 32,
-  },
-  emptyText: {
-    fontSize: 18,
-    fontWeight: "600",
-    color: colors.foreground.white,
-    marginTop: 16,
-    marginBottom: 8,
-  },
-  emptySubtext: {
-    fontSize: 14,
-    color: colors.foreground.gray,
-    textAlign: "center",
-  },
-});
+const createStyles = (theme: ReturnType<typeof useTheme>["theme"]) =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: theme.background.dark,
+    },
+    header: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+      paddingHorizontal: 16,
+      paddingVertical: 12,
+      borderBottomWidth: 1,
+      borderBottomColor: theme.background.darker,
+    },
+    headerTitle: {
+      fontSize: 24,
+      fontWeight: "700",
+      color: theme.foreground.white,
+    },
+    spacer: {
+      width: 28,
+    },
+    searchContainer: {
+      flexDirection: "row",
+      alignItems: "center",
+      marginHorizontal: 16,
+      marginVertical: 12,
+      paddingHorizontal: 12,
+      borderRadius: 12,
+      backgroundColor: theme.background.darker,
+    },
+    searchIcon: {
+      marginRight: 8,
+    },
+    searchInput: {
+      flex: 1,
+      paddingVertical: 12,
+      color: theme.foreground.white,
+      fontSize: 14,
+    },
+    listContent: {
+      paddingHorizontal: 12,
+      paddingVertical: 8,
+    },
+    userItemContainer: {
+      marginHorizontal: 0,
+    },
+    userItem: {
+      flexDirection: "row",
+      alignItems: "center",
+      paddingHorizontal: 12,
+      paddingVertical: 12,
+      marginVertical: 6,
+      borderRadius: 12,
+      backgroundColor: theme.background.darker,
+    },
+    userAvatar: {
+      width: 52,
+      height: 52,
+      borderRadius: 26,
+      marginRight: 12,
+    },
+    userInfo: {
+      flex: 1,
+    },
+    username: {
+      fontSize: 14,
+      fontWeight: "600",
+      color: theme.foreground.white,
+      marginBottom: 4,
+    },
+    bio: {
+      fontSize: 12,
+      color: theme.foreground.gray,
+    },
+    followButton: {
+      paddingHorizontal: 16,
+      paddingVertical: 8,
+      borderRadius: 8,
+      backgroundColor: theme.primary.main,
+    },
+    followingButton: {
+      backgroundColor: theme.background.accent,
+      borderWidth: 1,
+      borderColor: theme.primary.main,
+    },
+    followButtonText: {
+      fontSize: 12,
+      fontWeight: "600",
+      color: theme.background.dark,
+    },
+    followingButtonText: {
+      color: theme.primary.main,
+    },
+    emptyState: {
+      flex: 1,
+      justifyContent: "center",
+      alignItems: "center",
+      paddingHorizontal: 32,
+    },
+    emptyText: {
+      fontSize: 18,
+      fontWeight: "600",
+      color: theme.foreground.white,
+      marginTop: 16,
+      marginBottom: 8,
+    },
+    emptySubtext: {
+      fontSize: 14,
+      color: theme.foreground.gray,
+      textAlign: "center",
+    },
+  });
+
+const styles = StyleSheet.create({});

@@ -9,13 +9,13 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import LikeableImage from "../../components/ui/LikeableImage";
-import { colors } from "../../constants/colors";
+import ImageCarousel from "../../components/ui/ImageCarousel";
+import { useTheme } from "../../contexts/ThemeContext";
 import { getPostsByUserId, getUserById } from "../../data/mockData";
 
 interface UserPost {
   id: string;
-  image: string;
+  images: string[];
   likes: number;
   comments: number;
   caption: string;
@@ -34,6 +34,8 @@ interface UserPost {
 export default function UserPosts() {
   const router = useRouter();
   const { userId, postIndex } = useLocalSearchParams();
+  const { theme } = useTheme();
+  const styles = createStyles(theme);
   const flatListRef = useRef<FlatList>(null);
   const initialIndex = parseInt(postIndex as string) || 0;
 
@@ -44,7 +46,7 @@ export default function UserPosts() {
   const [posts, setPosts] = useState<UserPost[]>(
     userPostsData.map((post) => ({
       id: post.id,
-      image: post.image,
+      images: post.images,
       likes: post.likes,
       comments: post.comments,
       caption: post.caption,
@@ -108,34 +110,34 @@ export default function UserPosts() {
         <View style={styles.metricsContainer}>
           {item.weight && (
             <View style={styles.metricItem}>
-              <Ionicons name="barbell" size={16} color={colors.primary.main} />
+              <Ionicons name="barbell" size={16} color={theme.primary.main} />
               <Text style={styles.metricText}>{item.weight}</Text>
             </View>
           )}
           {item.sets && (
             <View style={styles.metricItem}>
-              <Ionicons name="repeat" size={16} color={colors.primary.main} />
+              <Ionicons name="repeat" size={16} color={theme.primary.main} />
               <Text style={styles.metricText}>{item.sets} sets</Text>
             </View>
           )}
           {item.reps && (
             <View style={styles.metricItem}>
-              <Ionicons name="fitness" size={16} color={colors.primary.main} />
+              <Ionicons name="fitness" size={16} color={theme.primary.main} />
               <Text style={styles.metricText}>{item.reps} reps</Text>
             </View>
           )}
           {item.duration && (
             <View style={styles.metricItem}>
-              <Ionicons name="time" size={16} color={colors.primary.main} />
+              <Ionicons name="time" size={16} color={theme.primary.main} />
               <Text style={styles.metricText}>{item.duration}</Text>
             </View>
           )}
         </View>
       )}
 
-      {/* Post Image */}
-      <LikeableImage
-        uri={item.image}
+      {/* Post Images */}
+      <ImageCarousel
+        images={item.images}
         style={styles.postImage}
         onLike={() => handleLike(item.id)}
         isLiked={item.isLiked}
@@ -151,21 +153,21 @@ export default function UserPosts() {
             <Ionicons
               name={item.isLiked ? "trophy" : "trophy-outline"}
               size={24}
-              color={item.isLiked ? "#FFD700" : colors.foreground.white}
+              color={item.isLiked ? theme.primary.main : theme.foreground.white}
             />
           </TouchableOpacity>
           <TouchableOpacity style={styles.actionButton}>
             <Ionicons
               name="chatbubble-outline"
               size={22}
-              color={colors.foreground.white}
+              color={theme.foreground.white}
             />
           </TouchableOpacity>
           <TouchableOpacity style={styles.actionButton}>
             <Ionicons
               name="share-outline"
               size={24}
-              color={colors.foreground.white}
+              color={theme.foreground.white}
             />
           </TouchableOpacity>
         </View>
@@ -195,7 +197,7 @@ export default function UserPosts() {
           <Ionicons
             name="chevron-back"
             size={28}
-            color={colors.foreground.white}
+            color={theme.foreground.white}
           />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Posts</Text>
@@ -215,117 +217,120 @@ export default function UserPosts() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background.dark,
-  },
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.background.darker,
-  },
-  headerTitle: {
-    fontSize: 20,
-    fontWeight: "700",
-    color: colors.foreground.white,
-  },
-  spacer: {
-    width: 28,
-  },
-  postContainer: {
-    marginBottom: 24,
-  },
-  listContent: {
-    paddingBottom: 24,
-  },
-  postHeader: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-  },
-  avatar: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    marginRight: 12,
-  },
-  username: {
-    fontSize: 14,
-    fontWeight: "600",
-    color: colors.foreground.white,
-  },
-  metricsContainer: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: 8,
-    paddingHorizontal: 16,
-    paddingBottom: 12,
-  },
-  metricItem: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 6,
-    backgroundColor: colors.background.darker,
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 8,
-  },
-  metricText: {
-    fontSize: 12,
-    fontWeight: "600",
-    color: colors.foreground.white,
-  },
-  postImage: {
-    width: "100%",
-    height: 400,
-    backgroundColor: colors.background.darker,
-  },
-  actionsContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-  },
-  leftActions: {
-    flexDirection: "row",
-    gap: 16,
-  },
-  actionButton: {
-    padding: 4,
-  },
-  contentContainer: {
-    paddingHorizontal: 16,
-  },
-  likes: {
-    fontSize: 14,
-    fontWeight: "600",
-    color: colors.foreground.white,
-    marginBottom: 8,
-  },
-  captionContainer: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-  },
-  captionUsername: {
-    fontSize: 14,
-    fontWeight: "600",
-    color: colors.foreground.white,
-  },
-  caption: {
-    fontSize: 14,
-    color: colors.foreground.white,
-    lineHeight: 20,
-  },
-  viewComments: {
-    fontSize: 14,
-    color: colors.foreground.gray,
-    marginTop: 8,
-  },
-});
+const createStyles = (theme: ReturnType<typeof useTheme>["theme"]) =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: theme.background.dark,
+    },
+    header: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+      paddingHorizontal: 16,
+      paddingVertical: 12,
+      borderBottomWidth: 1,
+      borderBottomColor: theme.background.darker,
+    },
+    headerTitle: {
+      fontSize: 20,
+      fontWeight: "700",
+      color: theme.foreground.white,
+    },
+    spacer: {
+      width: 28,
+    },
+    postContainer: {
+      marginBottom: 24,
+    },
+    listContent: {
+      paddingBottom: 24,
+    },
+    postHeader: {
+      flexDirection: "row",
+      alignItems: "center",
+      paddingHorizontal: 16,
+      paddingVertical: 12,
+    },
+    avatar: {
+      width: 40,
+      height: 40,
+      borderRadius: 20,
+      marginRight: 12,
+    },
+    username: {
+      fontSize: 14,
+      fontWeight: "600",
+      color: theme.foreground.white,
+    },
+    metricsContainer: {
+      flexDirection: "row",
+      flexWrap: "wrap",
+      gap: 8,
+      paddingHorizontal: 16,
+      paddingBottom: 12,
+    },
+    metricItem: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 6,
+      backgroundColor: theme.background.darker,
+      paddingHorizontal: 12,
+      paddingVertical: 6,
+      borderRadius: 8,
+    },
+    metricText: {
+      fontSize: 12,
+      fontWeight: "600",
+      color: theme.foreground.white,
+    },
+    postImage: {
+      width: "100%",
+      height: 400,
+      backgroundColor: theme.background.darker,
+    },
+    actionsContainer: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+      paddingHorizontal: 16,
+      paddingVertical: 12,
+    },
+    leftActions: {
+      flexDirection: "row",
+      gap: 16,
+    },
+    actionButton: {
+      padding: 4,
+    },
+    contentContainer: {
+      paddingHorizontal: 16,
+    },
+    likes: {
+      fontSize: 14,
+      fontWeight: "600",
+      color: theme.foreground.white,
+      marginBottom: 8,
+    },
+    captionContainer: {
+      flexDirection: "row",
+      flexWrap: "wrap",
+    },
+    captionUsername: {
+      fontSize: 14,
+      fontWeight: "600",
+      color: theme.foreground.white,
+    },
+    caption: {
+      fontSize: 14,
+      color: theme.foreground.white,
+      lineHeight: 20,
+    },
+    viewComments: {
+      fontSize: 14,
+      color: theme.foreground.gray,
+      marginTop: 8,
+    },
+  });
+
+const styles = StyleSheet.create({});

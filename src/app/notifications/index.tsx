@@ -9,7 +9,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { colors } from "../../constants/colors";
+import { useTheme } from "../../contexts/ThemeContext";
 import { getNotificationsWithUserData } from "../../data/mockData";
 
 interface NotificationWithUser {
@@ -28,6 +28,8 @@ interface NotificationWithUser {
 
 export default function Notifications() {
   const router = useRouter();
+  const { theme } = useTheme();
+  const styles = createStyles(theme);
   const notificationsData = useMemo(
     () => getNotificationsWithUserData() as NotificationWithUser[],
     [],
@@ -63,13 +65,13 @@ export default function Notifications() {
       case "like":
         return "#FF6B6B";
       case "follow":
-        return colors.primary.main;
+        return theme.primary.main;
       case "comment":
         return "#4ECDC4";
       case "mention":
         return "#FFD700";
       default:
-        return colors.foreground.gray;
+        return theme.foreground.gray;
     }
   }
 
@@ -109,7 +111,7 @@ export default function Notifications() {
           <Ionicons
             name="chevron-back"
             size={28}
-            color={colors.foreground.white}
+            color={theme.foreground.white}
           />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Notifications</Text>
@@ -128,9 +130,9 @@ export default function Notifications() {
             <Ionicons
               name="notifications-off-outline"
               size={48}
-              color={colors.foreground.gray}
+              color={theme.foreground.gray}
             />
-            <Text style={{ color: colors.foreground.gray, marginTop: 12 }}>
+            <Text style={{ color: theme.foreground.gray, marginTop: 12 }}>
               No notifications yet
             </Text>
           </View>
@@ -140,97 +142,100 @@ export default function Notifications() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background.dark,
-  },
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.background.darker,
-  },
-  headerTitle: {
-    fontSize: 24,
-    fontWeight: "700",
-    color: colors.foreground.white,
-  },
-  spacer: {
-    width: 28,
-  },
-  unreadBanner: {
-    backgroundColor: colors.primary.main,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    marginHorizontal: 16,
-    marginTop: 12,
-    borderRadius: 12,
-  },
-  unreadText: {
-    fontSize: 14,
-    fontWeight: "600",
-    color: colors.background.dark,
-  },
-  listContent: {
-    paddingHorizontal: 12,
-    paddingVertical: 12,
-  },
-  notificationItem: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingHorizontal: 12,
-    paddingVertical: 12,
-    marginVertical: 6,
-    borderRadius: 12,
-    backgroundColor: colors.background.darker,
-  },
-  notificationItemUnread: {
-    backgroundColor: colors.background.accent,
-  },
-  avatarContainer: {
-    width: 52,
-    height: 52,
-    borderRadius: 26,
-    marginRight: 12,
-    flexShrink: 0,
-  },
-  avatar: {
-    fontSize: 22,
-    fontWeight: "700",
-    color: colors.background.dark,
-  },
-  contentContainer: {
-    flex: 1,
-  },
-  textRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 6,
-    marginBottom: 4,
-  },
-  username: {
-    fontSize: 14,
-    fontWeight: "600",
-    color: colors.foreground.white,
-    marginBottom: 4,
-  },
-  action: {
-    fontSize: 13,
-    color: colors.foreground.gray,
-    marginBottom: 4,
-  },
-  timestamp: {
-    fontSize: 11,
-    color: colors.foreground.gray,
-  },
-  iconContainer: {
-    marginLeft: 8,
-    padding: 8,
-    backgroundColor: colors.background.dark,
-    borderRadius: 8,
-  },
-});
+const createStyles = (theme: ReturnType<typeof useTheme>["theme"]) =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: theme.background.dark,
+    },
+    header: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+      paddingHorizontal: 16,
+      paddingVertical: 12,
+      borderBottomWidth: 1,
+      borderBottomColor: theme.background.darker,
+    },
+    headerTitle: {
+      fontSize: 24,
+      fontWeight: "700",
+      color: theme.foreground.white,
+    },
+    spacer: {
+      width: 28,
+    },
+    unreadBanner: {
+      backgroundColor: theme.primary.main,
+      paddingHorizontal: 16,
+      paddingVertical: 12,
+      marginHorizontal: 16,
+      marginTop: 12,
+      borderRadius: 12,
+    },
+    unreadText: {
+      fontSize: 14,
+      fontWeight: "600",
+      color: theme.background.dark,
+    },
+    listContent: {
+      paddingHorizontal: 12,
+      paddingVertical: 12,
+    },
+    notificationItem: {
+      flexDirection: "row",
+      alignItems: "center",
+      paddingHorizontal: 12,
+      paddingVertical: 12,
+      marginVertical: 6,
+      borderRadius: 12,
+      backgroundColor: theme.background.darker,
+    },
+    notificationItemUnread: {
+      backgroundColor: theme.background.accent,
+    },
+    avatarContainer: {
+      width: 52,
+      height: 52,
+      borderRadius: 26,
+      marginRight: 12,
+      flexShrink: 0,
+    },
+    avatar: {
+      fontSize: 22,
+      fontWeight: "700",
+      color: theme.background.dark,
+    },
+    contentContainer: {
+      flex: 1,
+    },
+    textRow: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 6,
+      marginBottom: 4,
+    },
+    username: {
+      fontSize: 14,
+      fontWeight: "600",
+      color: theme.foreground.white,
+      marginBottom: 4,
+    },
+    action: {
+      fontSize: 13,
+      color: theme.foreground.gray,
+      marginBottom: 4,
+    },
+    timestamp: {
+      fontSize: 11,
+      color: theme.foreground.gray,
+    },
+    iconContainer: {
+      marginLeft: 8,
+      padding: 8,
+      backgroundColor: theme.background.dark,
+      borderRadius: 8,
+    },
+  });
+
+const styles = StyleSheet.create({});
