@@ -183,12 +183,15 @@ export default function Home() {
       <View style={styles.header}>
         <Image source={theme.logo} style={styles.logo} resizeMode="contain" />
         <View style={styles.headerIcons}>
-          <TouchableOpacity style={styles.iconButton}>
+          <TouchableOpacity
+            style={styles.iconButton}
+            onPress={() => router.navigate("/search")}
+          >
             <Ionicons name="search" size={24} color={theme.foreground.gray} />
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.iconButton}
-            onPress={() => router.navigate("/notifications")}
+            onPress={() => router.navigate("/notifications/index")}
           >
             <Ionicons
               name="notifications-outline"

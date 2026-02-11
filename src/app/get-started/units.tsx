@@ -34,7 +34,7 @@ export default function UnitsSelection() {
 
   const handleContinue = () => {
     // TODO: Save unit preferences
-    router.push("/get-started/gender");
+    router.navigate("/get-started/gender");
   };
 
   const renderOptionGroup = (

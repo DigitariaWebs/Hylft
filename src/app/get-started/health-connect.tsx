@@ -12,11 +12,11 @@ export default function HealthConnect() {
 
   const handleEnableHealthConnect = () => {
     // TODO: Enable Health Connect integration
-    router.push("/get-started/email-preferences");
+    router.navigate("/get-started/email-preferences");
   };
 
   const handleNotNow = () => {
-    router.push("/get-started/email-preferences");
+    router.navigate("/get-started/email-preferences");
   };
 
   return (

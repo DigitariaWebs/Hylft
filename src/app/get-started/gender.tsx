@@ -76,7 +76,7 @@ export default function GenderSelection() {
     if (!selectedGender) return;
     // Save gender preference and set theme
     setTheme(selectedGender as "male" | "female");
-    router.push("/get-started/health-connect");
+    router.navigate("/get-started/health-connect");
   };
 
   const styles = createStyles(theme);

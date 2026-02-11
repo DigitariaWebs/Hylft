@@ -12,12 +12,12 @@ export default function EmailPreferences() {
 
   const handleAccept = () => {
     // TODO: Save email preference
-    router.push("/get-started/ready");
+    router.navigate("/get-started/ready");
   };
 
   const handleDecline = () => {
     // TODO: Save email preference
-    router.push("/get-started/ready");
+    router.navigate("/get-started/ready");
   };
 
   return (
