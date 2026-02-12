@@ -59,6 +59,51 @@ export interface Comment {
   replies?: Reply[];
 }
 
+export interface Exercise {
+  id: string;
+  name: string;
+  sets: number;
+  reps: string;
+  weight?: string;
+  duration?: string;
+  notes?: string;
+}
+
+export interface Workout {
+  id: string;
+  userId: string;
+  name: string;
+  date: string;
+  startTime: string;
+  endTime: string;
+  duration: number; // in minutes
+  exercises: Exercise[];
+  caloriesBurned: number;
+  notes?: string;
+}
+
+export interface RoutineExercise {
+  id: string;
+  name: string;
+  sets: number;
+  reps: string;
+  restTime: number; // in seconds
+  notes?: string;
+}
+
+export interface Routine {
+  id: string;
+  userId: string;
+  name: string;
+  description: string;
+  exercises: RoutineExercise[];
+  estimatedDuration: number; // in minutes
+  targetMuscles: string[];
+  difficulty: "beginner" | "intermediate" | "advanced";
+  lastUsed?: string;
+  timesCompleted: number;
+}
+
 // ============================================
 // USERS DATA
 // ============================================
@@ -560,6 +605,460 @@ export const COMMENTS: Comment[] = [
 ];
 
 // ============================================
+// WORKOUTS DATA
+// ============================================
+const WORKOUTS: Workout[] = [
+  {
+    id: "w1",
+    userId: "1",
+    name: "Chest & Triceps",
+    date: "2024-02-12",
+    startTime: "06:00 AM",
+    endTime: "07:30 AM",
+    duration: 90,
+    caloriesBurned: 450,
+    exercises: [
+      {
+        id: "e1",
+        name: "Barbell Bench Press",
+        sets: 4,
+        reps: "6-8",
+        weight: "315 lbs",
+      },
+      {
+        id: "e2",
+        name: "Incline Dumbbell Press",
+        sets: 3,
+        reps: "8-10",
+        weight: "90 lbs",
+      },
+      {
+        id: "e3",
+        name: "Chest Flyes",
+        sets: 3,
+        reps: "10-12",
+        weight: "70 lbs",
+      },
+      {
+        id: "e4",
+        name: "Tricep Dips",
+        sets: 3,
+        reps: "8-12",
+        weight: "BW + 45 lbs",
+      },
+      {
+        id: "e5",
+        name: "Rope Tricep Pushdown",
+        sets: 3,
+        reps: "12-15",
+        weight: "100 lbs",
+      },
+    ],
+    notes: "Great pump today! Hit all the heavy compound movements.",
+  },
+  {
+    id: "w2",
+    userId: "1",
+    name: "Back & Biceps",
+    date: "2024-02-11",
+    startTime: "06:30 AM",
+    endTime: "08:00 AM",
+    duration: 90,
+    caloriesBurned: 480,
+    exercises: [
+      {
+        id: "e6",
+        name: "Barbell Rows",
+        sets: 4,
+        reps: "5-6",
+        weight: "405 lbs",
+      },
+      {
+        id: "e7",
+        name: "Pull-ups",
+        sets: 4,
+        reps: "8-10",
+        weight: "BW + 65 lbs",
+      },
+      {
+        id: "e8",
+        name: "Lat Pulldown",
+        sets: 3,
+        reps: "10-12",
+        weight: "230 lbs",
+      },
+      {
+        id: "e9",
+        name: "Barbell Curls",
+        sets: 4,
+        reps: "6-8",
+        weight: "140 lbs",
+      },
+      {
+        id: "e10",
+        name: "Hammer Curls",
+        sets: 3,
+        reps: "10-12",
+        weight: "60 lbs",
+      },
+    ],
+    notes: "Felt strong and focused. Great strength session!",
+  },
+  {
+    id: "w3",
+    userId: "1",
+    name: "Leg Day",
+    date: "2024-02-10",
+    startTime: "05:00 AM",
+    endTime: "07:30 AM",
+    duration: 150,
+    caloriesBurned: 600,
+    exercises: [
+      {
+        id: "e11",
+        name: "Barbell Squats",
+        sets: 5,
+        reps: "6-8",
+        weight: "465 lbs",
+      },
+      {
+        id: "e12",
+        name: "Leg Press",
+        sets: 4,
+        reps: "8-10",
+        weight: "765 lbs",
+      },
+      {
+        id: "e13",
+        name: "Leg Curls",
+        sets: 3,
+        reps: "10-12",
+        weight: "250 lbs",
+      },
+      {
+        id: "e14",
+        name: "Leg Extensions",
+        sets: 3,
+        reps: "12-15",
+        weight: "280 lbs",
+      },
+      {
+        id: "e15",
+        name: "Calf Raises",
+        sets: 4,
+        reps: "15-20",
+        weight: "500 lbs",
+      },
+    ],
+    notes:
+      "Destroyed quads and hamstrings. Progressive overload working great!",
+  },
+  {
+    id: "w4",
+    userId: "1",
+    name: "Shoulders & Abs",
+    date: "2024-02-09",
+    startTime: "06:00 AM",
+    endTime: "07:15 AM",
+    duration: 75,
+    caloriesBurned: 350,
+    exercises: [
+      {
+        id: "e16",
+        name: "Military Press",
+        sets: 4,
+        reps: "6-8",
+        weight: "185 lbs",
+      },
+      {
+        id: "e17",
+        name: "Lateral Raises",
+        sets: 4,
+        reps: "12-15",
+        weight: "60 lbs",
+      },
+      {
+        id: "e18",
+        name: "Reverse Pec Deck",
+        sets: 3,
+        reps: "12-15",
+        weight: "200 lbs",
+      },
+      {
+        id: "e19",
+        name: "Cable Lateral Raises",
+        sets: 3,
+        reps: "15-20",
+        weight: "30 lbs",
+      },
+      {
+        id: "e20",
+        name: "Weighted Ab Dips",
+        sets: 3,
+        reps: "12-15",
+        weight: "45 lbs",
+      },
+    ],
+    notes: "Shoulders feeling great! Continue with drop sets next session.",
+  },
+  {
+    id: "w5",
+    userId: "1",
+    name: "Cardio & Conditioning",
+    date: "2024-02-08",
+    startTime: "07:00 AM",
+    endTime: "08:00 AM",
+    duration: 60,
+    caloriesBurned: 520,
+    exercises: [
+      {
+        id: "e21",
+        name: "Treadmill Running",
+        sets: 1,
+        reps: "5km",
+        duration: "35",
+      },
+      {
+        id: "e22",
+        name: "Battle Ropes",
+        sets: 4,
+        reps: "45s",
+        duration: "10",
+      },
+      {
+        id: "e23",
+        name: "Jump Rope",
+        sets: 5,
+        reps: "100 reps",
+        duration: "10",
+      },
+    ],
+    notes:
+      "Solid cardio session. Maintaining good cardiovascular fitness during bulk.",
+  },
+];
+
+// ============================================
+// ROUTINES DATA
+// ============================================
+export const ROUTINES: Routine[] = [
+  {
+    id: "r1",
+    userId: "1",
+    name: "Push Day - Strength",
+    description: "Heavy compound movements for chest, shoulders and triceps",
+    estimatedDuration: 90,
+    targetMuscles: ["chest", "shoulders", "triceps"],
+    difficulty: "advanced",
+    lastUsed: "2024-02-12",
+    timesCompleted: 24,
+    exercises: [
+      {
+        id: "re1",
+        name: "Barbell Bench Press",
+        sets: 5,
+        reps: "5-6",
+        restTime: 180,
+        notes: "Focus on explosive concentric",
+      },
+      {
+        id: "re2",
+        name: "Incline Dumbbell Press",
+        sets: 4,
+        reps: "8-10",
+        restTime: 120,
+      },
+      {
+        id: "re3",
+        name: "Overhead Press",
+        sets: 4,
+        reps: "6-8",
+        restTime: 150,
+      },
+      {
+        id: "re4",
+        name: "Lateral Raises",
+        sets: 3,
+        reps: "12-15",
+        restTime: 60,
+      },
+      {
+        id: "re5",
+        name: "Tricep Dips",
+        sets: 3,
+        reps: "8-12",
+        restTime: 90,
+      },
+      {
+        id: "re6",
+        name: "Rope Pushdowns",
+        sets: 3,
+        reps: "15-20",
+        restTime: 60,
+      },
+    ],
+  },
+  {
+    id: "r2",
+    userId: "1",
+    name: "Pull Day - Hypertrophy",
+    description: "Back and biceps focused on muscle growth",
+    estimatedDuration: 85,
+    targetMuscles: ["back", "biceps", "rear delts"],
+    difficulty: "intermediate",
+    lastUsed: "2024-02-11",
+    timesCompleted: 31,
+    exercises: [
+      {
+        id: "re7",
+        name: "Barbell Rows",
+        sets: 4,
+        reps: "8-10",
+        restTime: 120,
+      },
+      {
+        id: "re8",
+        name: "Pull-ups",
+        sets: 4,
+        reps: "8-12",
+        restTime: 120,
+      },
+      {
+        id: "re9",
+        name: "Lat Pulldown",
+        sets: 3,
+        reps: "10-12",
+        restTime: 90,
+      },
+      {
+        id: "re10",
+        name: "Cable Rows",
+        sets: 3,
+        reps: "12-15",
+        restTime: 90,
+      },
+      {
+        id: "re11",
+        name: "Barbell Curls",
+        sets: 3,
+        reps: "8-10",
+        restTime: 90,
+      },
+      {
+        id: "re12",
+        name: "Hammer Curls",
+        sets: 3,
+        reps: "12-15",
+        restTime: 60,
+      },
+    ],
+  },
+  {
+    id: "r3",
+    userId: "1",
+    name: "Leg Day - Volume",
+    description: "High volume leg workout for quad and hamstring development",
+    estimatedDuration: 120,
+    targetMuscles: ["quads", "hamstrings", "glutes", "calves"],
+    difficulty: "advanced",
+    lastUsed: "2024-02-10",
+    timesCompleted: 18,
+    exercises: [
+      {
+        id: "re13",
+        name: "Barbell Squats",
+        sets: 5,
+        reps: "6-8",
+        restTime: 180,
+        notes: "Go deep, focus on form",
+      },
+      {
+        id: "re14",
+        name: "Leg Press",
+        sets: 4,
+        reps: "10-12",
+        restTime: 120,
+      },
+      {
+        id: "re15",
+        name: "Romanian Deadlifts",
+        sets: 4,
+        reps: "8-10",
+        restTime: 120,
+      },
+      {
+        id: "re16",
+        name: "Leg Extensions",
+        sets: 3,
+        reps: "12-15",
+        restTime: 90,
+      },
+      {
+        id: "re17",
+        name: "Leg Curls",
+        sets: 3,
+        reps: "12-15",
+        restTime: 90,
+      },
+      {
+        id: "re18",
+        name: "Calf Raises",
+        sets: 4,
+        reps: "15-20",
+        restTime: 60,
+      },
+    ],
+  },
+  {
+    id: "r4",
+    userId: "1",
+    name: "Upper Body Power",
+    description: "Full upper body strength and power workout",
+    estimatedDuration: 75,
+    targetMuscles: ["chest", "back", "shoulders", "arms"],
+    difficulty: "intermediate",
+    timesCompleted: 12,
+    exercises: [
+      {
+        id: "re19",
+        name: "Bench Press",
+        sets: 4,
+        reps: "5-6",
+        restTime: 180,
+      },
+      {
+        id: "re20",
+        name: "Barbell Rows",
+        sets: 4,
+        reps: "5-6",
+        restTime: 180,
+      },
+      {
+        id: "re21",
+        name: "Overhead Press",
+        sets: 3,
+        reps: "8-10",
+        restTime: 120,
+      },
+      {
+        id: "re22",
+        name: "Pull-ups",
+        sets: 3,
+        reps: "8-10",
+        restTime: 120,
+      },
+      {
+        id: "re23",
+        name: "Dumbbell Curls",
+        sets: 3,
+        reps: "10-12",
+        restTime: 60,
+      },
+    ],
+  },
+];
+
+// ============================================
 // HELPER FUNCTIONS
 // ============================================
 
@@ -651,4 +1150,59 @@ export function getUserProfile(userId: string) {
       caption: post.caption,
     })),
   };
+}
+
+/**
+ * Get all workouts for a specific user
+ */
+export function getWorkoutsByUserId(userId: string): Workout[] {
+  return [];
+}
+
+/**
+ * Get workout by ID
+ */
+export function getWorkoutById(workoutId: string): Workout | undefined {
+  return WORKOUTS.find((workout) => workout.id === workoutId);
+}
+
+/**
+ * Get all workouts
+ */
+export function getAllWorkouts(): Workout[] {
+  return WORKOUTS;
+}
+
+/**
+ * Get recent workouts for a user (last 7 days)
+ */
+export function getRecentWorkouts(userId: string, days: number = 7): Workout[] {
+  const now = new Date();
+  const pastDate = new Date(now.getTime() - days * 24 * 60 * 60 * 1000);
+
+  return getWorkoutsByUserId(userId).filter((workout) => {
+    const workoutDate = new Date(workout.date);
+    return workoutDate >= pastDate;
+  });
+}
+
+/**
+ * Get all routines for a specific user
+ */
+export function getRoutinesByUserId(userId: string): Routine[] {
+  return ROUTINES.filter((routine) => routine.userId === userId);
+}
+
+/**
+ * Get routine by ID
+ */
+export function getRoutineById(routineId: string): Routine | undefined {
+  return ROUTINES.find((routine) => routine.id === routineId);
+}
+
+/**
+ * Get all routines
+ */
+export function getAllRoutines(): Routine[] {
+  return ROUTINES;
 }
