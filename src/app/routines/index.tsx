@@ -67,7 +67,13 @@ export default function AllRoutines() {
         ) : (
           <>
             {routines.map((routine) => (
-              <RoutineCard key={routine.id} routine={routine} fullWidth />
+              <RoutineCard
+                key={routine.id}
+                routine={routine}
+                fullWidth
+                onPress={() => router.push(`/routines/${routine.id}` as any)}
+                onStart={() => router.push(`/routines/${routine.id}` as any)}
+              />
             ))}
           </>
         )}

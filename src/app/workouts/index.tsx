@@ -10,6 +10,7 @@ import {
 } from "react-native";
 import WorkoutCard from "../../components/ui/WorkoutCard";
 import { Theme } from "../../constants/themes";
+import { useActiveWorkout } from "../../contexts/ActiveWorkoutContext";
 import { useTheme } from "../../contexts/ThemeContext";
 import { getWorkoutsByUserId, Workout } from "../../data/mockData";
 
@@ -18,6 +19,7 @@ export default function AllWorkouts() {
   const styles = createStyles(theme);
   const router = useRouter();
   const [workouts, setWorkouts] = useState<Workout[]>([]);
+  const { startWorkout } = useActiveWorkout();
 
   const loadData = useCallback(() => {
     // For now, hardcode userId "1"
@@ -87,7 +89,39 @@ export default function AllWorkouts() {
         ) : (
           <>
             {workouts.map((workout) => (
-              <WorkoutCard key={workout.id} workout={workout} fullWidth />
+              <WorkoutCard
+                key={workout.id}
+                workout={workout}
+                fullWidth
+                onPress={() => router.push(`/workouts/${workout.id}` as any)}
+                onStart={() => {
+                  const active = {
+                    id: `workout-${Date.now()}`,
+                    duration: workout.duration || 0,
+                    volume: 0,
+                    sets: workout.exercises.reduce(
+                      (s, e) => s + (e.sets || 0),
+                      0,
+                    ),
+                    exercises: workout.exercises.map((ex) => ({
+                      id: `${Date.now()}-${Math.random()}`,
+                      exerciseId: 0,
+                      name: ex.name,
+                      muscles: [],
+                      equipment: [],
+                      sets: Array.from({ length: ex.sets }).map((_, i) => ({
+                        id: `${Date.now()}-${Math.random()}-${i}`,
+                        setNumber: i + 1,
+                        kg: ex.weight || "",
+                        reps: ex.reps || "",
+                        isCompleted: false,
+                      })),
+                      addedAt: Date.now(),
+                    })),
+                  };
+                  startWorkout(active);
+                }}
+              />
             ))}
           </>
         )}

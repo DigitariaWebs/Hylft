@@ -7,11 +7,17 @@ import { Workout } from "../../data/mockData";
 type Props = {
   workout: Workout;
   onPress?: () => void;
+  onStart?: () => void;
   /** expands card to full width when true */
   fullWidth?: boolean;
 };
 
-const WorkoutCard = ({ workout, onPress, fullWidth = false }: Props) => {
+const WorkoutCard = ({
+  workout,
+  onPress,
+  onStart,
+  fullWidth = false,
+}: Props) => {
   const { theme } = useTheme();
   const styles = createStyles(theme);
 
@@ -68,6 +74,16 @@ const WorkoutCard = ({ workout, onPress, fullWidth = false }: Props) => {
           </View>
         )}
       </View>
+
+      {/* Start button */}
+      <TouchableOpacity
+        onPress={onStart}
+        activeOpacity={0.85}
+        style={styles.startButton}
+      >
+        <Text style={styles.startButtonText}>Start Workout</Text>
+        <Ionicons name="arrow-forward" size={14} color={"#111"} />
+      </TouchableOpacity>
     </TouchableOpacity>
   );
 };
@@ -168,6 +184,21 @@ const createStyles = (theme: ReturnType<typeof useTheme>["theme"]) =>
       fontSize: 12,
       fontWeight: "600",
       color: theme.foreground.gray,
+    },
+    startButton: {
+      marginTop: 12,
+      backgroundColor: theme.primary.main,
+      paddingVertical: 12,
+      borderRadius: 12,
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "center",
+      gap: 8,
+    },
+    startButtonText: {
+      color: theme.background.dark,
+      fontSize: 14,
+      fontWeight: "700",
     },
   });
 
