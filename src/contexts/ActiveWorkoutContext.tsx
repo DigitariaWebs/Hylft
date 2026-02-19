@@ -1,10 +1,24 @@
 import React, { createContext, ReactNode, useContext, useState } from "react";
 
+/** Exercise entry within a workout session */
+export interface WorkoutExerciseEntry {
+  id: string; // unique id for this entry in the workout
+  exerciseId: number; // wger exercise id
+  name: string;
+  muscles: Array<{ id: number; name: string; name_en: string }>;
+  equipment: Array<{ id: number; name: string }>;
+  reps?: number;
+  weight?: number;
+  notes?: string;
+  addedAt: number; // timestamp
+}
+
 interface ActiveWorkout {
   id: string;
   duration: number;
   volume: number;
   sets: number;
+  exercises: WorkoutExerciseEntry[];
 }
 
 interface ActiveWorkoutContextType {
@@ -12,6 +26,12 @@ interface ActiveWorkoutContextType {
   startWorkout: (workout: ActiveWorkout) => void;
   updateWorkout: (updates: Partial<ActiveWorkout>) => void;
   discardWorkout: () => void;
+  addExerciseToWorkout: (exercise: any) => void; // from wgerApi
+  removeExerciseFromWorkout: (exerciseEntryId: string) => void;
+  updateExerciseEntry: (
+    exerciseEntryId: string,
+    updates: Partial<WorkoutExerciseEntry>,
+  ) => void;
   isExpanded: boolean;
   setIsExpanded: (expanded: boolean) => void;
 }
@@ -43,7 +63,11 @@ export const ActiveWorkoutProvider: React.FC<ActiveWorkoutProviderProps> = ({
   const [isExpanded, setIsExpanded] = useState(false);
 
   const startWorkout = (workout: ActiveWorkout) => {
-    setActiveWorkout(workout);
+    const workoutWithExercises = {
+      ...workout,
+      exercises: workout.exercises || [],
+    };
+    setActiveWorkout(workoutWithExercises);
     setIsExpanded(true);
   };
 
@@ -58,6 +82,49 @@ export const ActiveWorkoutProvider: React.FC<ActiveWorkoutProviderProps> = ({
     setIsExpanded(false);
   };
 
+  const addExerciseToWorkout = (exercise: any) => {
+    if (!activeWorkout) return;
+
+    const entry: WorkoutExerciseEntry = {
+      id: `${Date.now()}-${Math.random()}`, // unique entry id
+      exerciseId: exercise.id,
+      name: exercise.name,
+      muscles: exercise.muscles || [],
+      equipment: exercise.equipment || [],
+      addedAt: Date.now(),
+    };
+
+    setActiveWorkout({
+      ...activeWorkout,
+      exercises: [...activeWorkout.exercises, entry],
+      sets: activeWorkout.sets + 1, // increment set count
+    });
+  };
+
+  const removeExerciseFromWorkout = (exerciseEntryId: string) => {
+    if (!activeWorkout) return;
+    setActiveWorkout({
+      ...activeWorkout,
+      exercises: activeWorkout.exercises.filter(
+        (ex) => ex.id !== exerciseEntryId,
+      ),
+      sets: Math.max(0, activeWorkout.sets - 1),
+    });
+  };
+
+  const updateExerciseEntry = (
+    exerciseEntryId: string,
+    updates: Partial<WorkoutExerciseEntry>,
+  ) => {
+    if (!activeWorkout) return;
+    setActiveWorkout({
+      ...activeWorkout,
+      exercises: activeWorkout.exercises.map((ex) =>
+        ex.id === exerciseEntryId ? { ...ex, ...updates } : ex,
+      ),
+    });
+  };
+
   return (
     <ActiveWorkoutContext.Provider
       value={{
@@ -65,6 +132,9 @@ export const ActiveWorkoutProvider: React.FC<ActiveWorkoutProviderProps> = ({
         startWorkout,
         updateWorkout,
         discardWorkout,
+        addExerciseToWorkout,
+        removeExerciseFromWorkout,
+        updateExerciseEntry,
         isExpanded,
         setIsExpanded,
       }}

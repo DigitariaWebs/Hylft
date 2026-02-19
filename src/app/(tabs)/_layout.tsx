@@ -5,10 +5,7 @@ import { View } from "react-native";
 import { CustomTabBar } from "../../components/layout/CustomTabBar";
 import ActiveWorkoutSheet from "../../components/ui/ActiveWorkoutSheet";
 import { MiniWorkoutPlayer } from "../../components/ui/MiniWorkoutPlayer";
-import {
-  ActiveWorkoutProvider,
-  useActiveWorkout,
-} from "../../contexts/ActiveWorkoutContext";
+import { useActiveWorkout } from "../../contexts/ActiveWorkoutContext";
 
 function TabsLayoutContent() {
   const { activeWorkout, setIsExpanded, isExpanded } = useActiveWorkout();
@@ -16,11 +13,6 @@ function TabsLayoutContent() {
 
   const handleExpandWorkout = () => {
     setIsExpanded(true);
-  };
-
-  const handleAddExercise = () => {
-    console.log("Add exercise");
-    // TODO: Navigate to exercise selection or show exercise picker
   };
 
   const handleWorkoutSettings = () => {
@@ -76,7 +68,6 @@ function TabsLayoutContent() {
       >
         <ActiveWorkoutSheet
           ref={activeWorkoutSheetRef}
-          onAddExercise={handleAddExercise}
           onSettings={handleWorkoutSettings}
           isExpanded={activeWorkout ? isExpanded : false}
         />
@@ -86,9 +77,5 @@ function TabsLayoutContent() {
 }
 
 export default function TabsLayout() {
-  return (
-    <ActiveWorkoutProvider>
-      <TabsLayoutContent />
-    </ActiveWorkoutProvider>
-  );
+  return <TabsLayoutContent />;
 }

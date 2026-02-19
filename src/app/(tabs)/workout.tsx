@@ -40,12 +40,8 @@ export default function Workout() {
       duration: 0,
       volume: 0,
       sets: 0,
+      exercises: [],
     });
-  };
-
-  const handleAddExercise = () => {
-    console.log("Add exercise");
-    // TODO: Navigate to exercise selection or show exercise picker
   };
 
   const handleWorkoutSettings = () => {

@@ -1,30 +1,38 @@
 import { Ionicons } from "@expo/vector-icons";
 import BottomSheet, { BottomSheetView } from "@gorhom/bottom-sheet";
+import { useRouter } from "expo-router";
 import React, { forwardRef, useMemo } from "react";
 import {
+  FlatList,
   StyleSheet,
   Text,
   TouchableOpacity,
-  useWindowDimensions,
   View,
 } from "react-native";
 import { Theme } from "../../constants/themes";
-import { useActiveWorkout } from "../../contexts/ActiveWorkoutContext";
+import {
+  useActiveWorkout,
+  WorkoutExerciseEntry,
+} from "../../contexts/ActiveWorkoutContext";
 import { useTheme } from "../../contexts/ThemeContext";
 
 interface ActiveWorkoutSheetProps {
-  onAddExercise?: () => void;
   onSettings?: () => void;
   isExpanded?: boolean;
 }
 
 const ActiveWorkoutSheet = forwardRef<BottomSheet, ActiveWorkoutSheetProps>(
-  ({ onAddExercise, onSettings, isExpanded = false }, ref) => {
+  ({ onSettings, isExpanded = false }, ref) => {
+    const router = useRouter();
     const { theme } = useTheme();
-    const { height } = useWindowDimensions();
     const styles = createStyles(theme);
-    const { activeWorkout, discardWorkout, setIsExpanded } = useActiveWorkout();
-    const snapPoints = useMemo(() => [height], [height]);
+    const {
+      activeWorkout,
+      discardWorkout,
+      setIsExpanded,
+      removeExerciseFromWorkout,
+    } = useActiveWorkout();
+    const snapPoints = useMemo(() => ["100%"], []);
 
     // Format duration as mm:ss
     const formatDuration = (seconds: number) => {
@@ -38,6 +46,33 @@ const ActiveWorkoutSheet = forwardRef<BottomSheet, ActiveWorkoutSheetProps>(
       setIsExpanded(false);
     };
 
+    const renderExerciseItem = ({ item }: { item: WorkoutExerciseEntry }) => {
+      const muscles = item.muscles.map((m) => m.name_en || m.name).join(", ");
+
+      return (
+        <View style={styles.exerciseListItem}>
+          <View style={styles.exerciseListItemContent}>
+            <Text style={styles.exerciseListItemName}>{item.name}</Text>
+            <Text style={styles.exerciseListItemMuscles}>{muscles}</Text>
+            <View style={styles.repsWeightContainer}>
+              {item.reps ? (
+                <Text style={styles.repsWeightText}>{item.reps} reps</Text>
+              ) : null}
+              {item.weight ? (
+                <Text style={styles.repsWeightText}>{item.weight} lbs</Text>
+              ) : null}
+            </View>
+          </View>
+          <TouchableOpacity
+            onPress={() => removeExerciseFromWorkout(item.id)}
+            hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+          >
+            <Ionicons name="trash-outline" size={20} color="#ef4444" />
+          </TouchableOpacity>
+        </View>
+      );
+    };
+
     if (!activeWorkout) {
       return null;
     }
@@ -47,8 +82,11 @@ const ActiveWorkoutSheet = forwardRef<BottomSheet, ActiveWorkoutSheetProps>(
         ref={ref}
         index={isExpanded ? 0 : -1}
         snapPoints={snapPoints}
-        enablePanDownToClose={true}
-        onClose={() => setIsExpanded(false)}
+        enableDynamicSizing={false}
+        enablePanDownToClose
+        onClose={() => {
+          setIsExpanded(false);
+        }}
         backgroundStyle={styles.bottomSheetBackground}
         handleIndicatorStyle={styles.handleIndicator}
       >
@@ -111,25 +149,43 @@ const ActiveWorkoutSheet = forwardRef<BottomSheet, ActiveWorkoutSheetProps>(
             </View>
           </View>
 
-          {/* Empty State */}
-          <View style={styles.emptyState}>
-            <View style={styles.emptyIconContainer}>
-              <Ionicons
-                name="fitness-outline"
-                size={64}
-                color={theme.foreground.gray}
-              />
+          {/* Exercises List or Empty State */}
+          {activeWorkout.exercises.length > 0 ? (
+            <FlatList
+              data={activeWorkout.exercises}
+              keyExtractor={(item) => item.id}
+              renderItem={renderExerciseItem}
+              scrollEnabled={false}
+              ItemSeparatorComponent={() => (
+                <View
+                  style={{
+                    height: 1,
+                    backgroundColor: theme.foreground.gray,
+                    opacity: 0.2,
+                  }}
+                />
+              )}
+            />
+          ) : (
+            <View style={styles.emptyState}>
+              <View style={styles.emptyIconContainer}>
+                <Ionicons
+                  name="fitness-outline"
+                  size={64}
+                  color={theme.foreground.gray}
+                />
+              </View>
+              <Text style={styles.emptyTitle}>Get Started</Text>
+              <Text style={styles.emptySubtitle}>
+                Add an exercise to start your workout
+              </Text>
             </View>
-            <Text style={styles.emptyTitle}>Get Started</Text>
-            <Text style={styles.emptySubtitle}>
-              Add an exercise to start your workout
-            </Text>
-          </View>
+          )}
 
           {/* Add Exercise Button */}
           <TouchableOpacity
             style={styles.addExerciseButton}
-            onPress={onAddExercise}
+            onPress={() => router.navigate("exercise-picker" as any)}
           >
             <Ionicons
               name="add-circle"
@@ -245,6 +301,35 @@ const createStyles = (theme: Theme) =>
       fontSize: 16,
       fontWeight: "700",
       color: theme.background.dark,
+    },
+    exerciseListItem: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+      paddingVertical: 16,
+      gap: 12,
+    },
+    exerciseListItemContent: {
+      flex: 1,
+      gap: 4,
+    },
+    exerciseListItemName: {
+      fontSize: 16,
+      fontWeight: "700",
+      color: theme.foreground.white,
+    },
+    exerciseListItemMuscles: {
+      fontSize: 13,
+      color: theme.foreground.gray,
+    },
+    repsWeightContainer: {
+      flexDirection: "row",
+      gap: 12,
+    },
+    repsWeightText: {
+      fontSize: 13,
+      fontWeight: "600",
+      color: theme.primary.main,
     },
   });
 
