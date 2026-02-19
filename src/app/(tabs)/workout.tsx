@@ -1,6 +1,9 @@
 import { Ionicons } from "@expo/vector-icons";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
+  Alert,
+  Modal,
+  Pressable,
   ScrollView,
   StyleSheet,
   Text,
@@ -23,6 +26,10 @@ export default function Workout() {
   const [workouts, setWorkouts] = useState<WorkoutData[]>([]);
   const [routines, setRoutines] = useState<Routine[]>([]);
   const { startWorkout } = useActiveWorkout();
+
+  const [plusModalVisible, setPlusModalVisible] = useState(false);
+  const scrollRef = useRef<ScrollView | null>(null);
+  const routinesSectionY = useRef<number>(0);
 
   useEffect(() => {
     // Simulating fetching workouts for current user (userId "1")
@@ -54,58 +61,130 @@ export default function Workout() {
       {/* Header */}
       <View style={styles.header}>
         <Text style={styles.headerTitle}>Workout</Text>
-        <TouchableOpacity style={styles.addButton}>
+        <TouchableOpacity
+          style={styles.addButton}
+          onPress={() => setPlusModalVisible(true)}
+        >
           <Ionicons name="add-circle" size={32} color={theme.primary.main} />
         </TouchableOpacity>
       </View>
 
+      {/* Plus modal */}
+      <Modal
+        transparent
+        visible={plusModalVisible}
+        animationType="fade"
+        onRequestClose={() => setPlusModalVisible(false)}
+      >
+        <Pressable
+          style={styles.modalOverlay}
+          onPress={() => setPlusModalVisible(false)}
+        >
+          <View style={styles.modalSheet}>
+            <TouchableOpacity
+              style={styles.modalOption}
+              onPress={() => {
+                handleStartEmptyWorkout();
+                setPlusModalVisible(false);
+              }}
+            >
+              <Text style={styles.modalOptionText}>Start Empty Workout</Text>
+            </TouchableOpacity>
+
+            <View style={styles.modalDivider} />
+
+            <TouchableOpacity
+              style={styles.modalOption}
+              onPress={() => {
+                setPlusModalVisible(false);
+                Alert.alert(
+                  "Create Routine",
+                  "Create routine flow not implemented yet",
+                );
+              }}
+            >
+              <Text style={styles.modalOptionText}>Create Routine</Text>
+            </TouchableOpacity>
+
+            <View style={styles.modalDivider} />
+
+            <TouchableOpacity
+              style={styles.modalOption}
+              onPress={() => {
+                setPlusModalVisible(false);
+              }}
+            >
+              <Text style={styles.modalOptionTextDanger}>Cancel</Text>
+            </TouchableOpacity>
+          </View>
+        </Pressable>
+      </Modal>
+
       {/* Content */}
       <ScrollView
+        ref={scrollRef}
         style={styles.content}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: 70 }}
       >
-        {/* Quick Actions */}
-        <View style={styles.quickActions}>
+        {/* Quick Actions - new layout */}
+        <View style={styles.quickActionsColumn}>
+          {/* Row 1: full-width Explore */}
           <TouchableOpacity
-            style={styles.actionButton}
-            onPress={handleStartEmptyWorkout}
+            style={[styles.actionButton, styles.actionButtonFull]}
+            onPress={() =>
+              scrollRef.current?.scrollTo({
+                y: routinesSectionY.current,
+                animated: true,
+              })
+            }
           >
-            <View style={styles.actionIconContainer}>
-              <Ionicons
-                name="fitness-outline"
-                size={28}
-                color={theme.primary.main}
-              />
-            </View>
-            <Text style={styles.actionButtonText}>Start Empty Workout</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.actionButton}>
-            <View style={styles.actionIconContainer}>
-              <Ionicons
-                name="create-outline"
-                size={28}
-                color={theme.primary.main}
-              />
-            </View>
-            <Text style={styles.actionButtonText}>Create Routine</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.actionButton}>
-            <View style={styles.actionIconContainer}>
+            <View style={[styles.actionBgIcon, { right: -12, bottom: -20 }]}>
               <Ionicons
                 name="compass-outline"
-                size={28}
+                size={90}
                 color={theme.primary.main}
               />
             </View>
             <Text style={styles.actionButtonText}>Explore Routines</Text>
           </TouchableOpacity>
+
+          {/* Row 2: two buttons side-by-side */}
+          <View style={styles.quickActionsRow}>
+            <TouchableOpacity
+              style={styles.actionButton}
+              onPress={handleStartEmptyWorkout}
+            >
+              <View style={[styles.actionBgIcon, { right: -14, bottom: -18 }]}>
+                <Ionicons
+                  name="fitness-outline"
+                  size={70}
+                  color={theme.primary.main}
+                />
+              </View>
+              <Text style={styles.actionButtonText}>Start Empty Workout</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity style={styles.actionButton}>
+              <View style={[styles.actionBgIcon, { right: -14, bottom: -18 }]}>
+                <Ionicons
+                  name="create-outline"
+                  size={70}
+                  color={theme.primary.main}
+                />
+              </View>
+              <Text style={styles.actionButtonText}>Create Routine</Text>
+            </TouchableOpacity>
+          </View>
         </View>
 
         {/* My Routines Section */}
-        <View style={styles.section}>
+        <View
+          style={styles.section}
+          onLayout={(e) => {
+            routinesSectionY.current = e.nativeEvent.layout.y;
+          }}
+        >
           <View style={styles.sectionHeader}>
             <Text style={styles.sectionTitle}>My Routines</Text>
             <TouchableOpacity>
@@ -313,33 +392,52 @@ const createStyles = (theme: Theme) =>
       flex: 1,
     },
     // Quick Actions
-    quickActions: {
-      flexDirection: "row",
+    quickActionsColumn: {
+      flexDirection: "column",
       paddingHorizontal: 16,
-      paddingVertical: 20,
+      paddingVertical: 12,
+      gap: 12,
+    },
+    quickActionsRow: {
+      flexDirection: "row",
       gap: 12,
     },
     actionButton: {
       flex: 1,
       backgroundColor: theme.background.darker,
       borderRadius: 12,
-      padding: 16,
+      paddingVertical: 18,
+      paddingHorizontal: 12,
       alignItems: "center",
       gap: 8,
       borderWidth: 1,
       borderColor: theme.background.darker,
+      overflow: "hidden",
+    },
+    actionBgIcon: {
+      position: "absolute",
+      opacity: 0.07,
+    },
+    actionButtonFull: {
+      width: "100%",
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "center",
+      paddingHorizontal: 16,
+      paddingVertical: 18,
+      gap: 12,
     },
     actionIconContainer: {
-      width: 56,
-      height: 56,
-      borderRadius: 28,
+      width: 40,
+      height: 40,
+      borderRadius: 20,
       backgroundColor: theme.background.dark,
       alignItems: "center",
       justifyContent: "center",
-      marginBottom: 4,
+      marginBottom: 0,
     },
     actionButtonText: {
-      fontSize: 12,
+      fontSize: 13,
       fontWeight: "600",
       color: theme.foreground.white,
       textAlign: "center",
@@ -484,6 +582,41 @@ const createStyles = (theme: Theme) =>
       fontSize: 14,
       fontWeight: "700",
       color: theme.background.dark,
+    },
+    // Plus modal
+    modalOverlay: {
+      flex: 1,
+      backgroundColor: "rgba(0,0,0,0.5)",
+      justifyContent: "center",
+      alignItems: "center",
+      padding: 24,
+    },
+    modalSheet: {
+      width: "100%",
+      maxWidth: 480,
+      backgroundColor: theme.background.darker,
+      borderRadius: 14,
+      paddingVertical: 8,
+      overflow: "hidden",
+      borderWidth: 1,
+      borderColor: theme.background.dark,
+    },
+    modalOption: {
+      paddingVertical: 16,
+      paddingHorizontal: 20,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    modalOptionText: {
+      fontSize: 16,
+      fontWeight: "700",
+      color: theme.foreground.white,
+    },
+    modalDivider: { height: 1, backgroundColor: theme.background.dark },
+    modalOptionTextDanger: {
+      fontSize: 16,
+      fontWeight: "700",
+      color: "#ef4444",
     },
     // Workouts List
     workoutsList: {

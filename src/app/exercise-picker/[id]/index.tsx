@@ -379,19 +379,6 @@ const createStyles = (theme: Theme) =>
       alignItems: "center",
       backgroundColor: theme.background.darker,
     },
-    diffBadgeOverlay: {
-      position: "absolute",
-      bottom: 12,
-      right: 12,
-      flexDirection: "row",
-      alignItems: "center",
-      gap: 5,
-      paddingHorizontal: 10,
-      paddingVertical: 5,
-      borderRadius: 20,
-      borderWidth: 1.5,
-    },
-    diffBadgeText: { fontSize: 12, fontWeight: "700" },
     // Title
     titleSection: { marginBottom: 20 },
     exerciseName: {

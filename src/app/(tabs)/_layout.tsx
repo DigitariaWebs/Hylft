@@ -68,7 +68,6 @@ function TabsLayoutContent() {
       >
         <ActiveWorkoutSheet
           ref={activeWorkoutSheetRef}
-          onSettings={handleWorkoutSettings}
           isExpanded={activeWorkout ? isExpanded : false}
         />
       </View>
