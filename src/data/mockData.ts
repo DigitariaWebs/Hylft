@@ -622,39 +622,39 @@ const WORKOUTS: Workout[] = [
         id: "e1",
         name: "Barbell Bench Press",
         sets: 4,
-        reps: "6-8",
-        weight: "315 lbs",
+        reps: "8",
+        weight: "120 kg",
       },
       {
         id: "e2",
         name: "Incline Dumbbell Press",
         sets: 3,
-        reps: "8-10",
-        weight: "90 lbs",
+        reps: "10",
+        weight: "40 kg",
       },
       {
         id: "e3",
         name: "Chest Flyes",
         sets: 3,
-        reps: "10-12",
-        weight: "70 lbs",
+        reps: "12",
+        weight: "20 kg",
       },
       {
         id: "e4",
         name: "Tricep Dips",
         sets: 3,
-        reps: "8-12",
-        weight: "BW + 45 lbs",
+        reps: "10",
+        weight: "25 kg",
       },
       {
         id: "e5",
         name: "Rope Tricep Pushdown",
         sets: 3,
-        reps: "12-15",
-        weight: "100 lbs",
+        reps: "15",
+        weight: "35 kg",
       },
     ],
-    notes: "Great pump today! Hit all the heavy compound movements.",
+    notes: undefined,
   },
   {
     id: "w2",
@@ -670,171 +670,39 @@ const WORKOUTS: Workout[] = [
         id: "e6",
         name: "Barbell Rows",
         sets: 4,
-        reps: "5-6",
-        weight: "405 lbs",
+        reps: "6",
+        weight: "100 kg",
       },
       {
         id: "e7",
         name: "Pull-ups",
         sets: 4,
-        reps: "8-10",
-        weight: "BW + 65 lbs",
+        reps: "10",
+        weight: "20 kg",
       },
       {
         id: "e8",
         name: "Lat Pulldown",
         sets: 3,
-        reps: "10-12",
-        weight: "230 lbs",
+        reps: "12",
+        weight: "80 kg",
       },
       {
         id: "e9",
         name: "Barbell Curls",
         sets: 4,
-        reps: "6-8",
-        weight: "140 lbs",
+        reps: "8",
+        weight: "50 kg",
       },
       {
         id: "e10",
         name: "Hammer Curls",
         sets: 3,
-        reps: "10-12",
-        weight: "60 lbs",
+        reps: "12",
+        weight: "22 kg",
       },
     ],
-    notes: "Felt strong and focused. Great strength session!",
-  },
-  {
-    id: "w3",
-    userId: "1",
-    name: "Leg Day",
-    date: "2024-02-10",
-    startTime: "05:00 AM",
-    endTime: "07:30 AM",
-    duration: 150,
-    caloriesBurned: 600,
-    exercises: [
-      {
-        id: "e11",
-        name: "Barbell Squats",
-        sets: 5,
-        reps: "6-8",
-        weight: "465 lbs",
-      },
-      {
-        id: "e12",
-        name: "Leg Press",
-        sets: 4,
-        reps: "8-10",
-        weight: "765 lbs",
-      },
-      {
-        id: "e13",
-        name: "Leg Curls",
-        sets: 3,
-        reps: "10-12",
-        weight: "250 lbs",
-      },
-      {
-        id: "e14",
-        name: "Leg Extensions",
-        sets: 3,
-        reps: "12-15",
-        weight: "280 lbs",
-      },
-      {
-        id: "e15",
-        name: "Calf Raises",
-        sets: 4,
-        reps: "15-20",
-        weight: "500 lbs",
-      },
-    ],
-    notes:
-      "Destroyed quads and hamstrings. Progressive overload working great!",
-  },
-  {
-    id: "w4",
-    userId: "1",
-    name: "Shoulders & Abs",
-    date: "2024-02-09",
-    startTime: "06:00 AM",
-    endTime: "07:15 AM",
-    duration: 75,
-    caloriesBurned: 350,
-    exercises: [
-      {
-        id: "e16",
-        name: "Military Press",
-        sets: 4,
-        reps: "6-8",
-        weight: "185 lbs",
-      },
-      {
-        id: "e17",
-        name: "Lateral Raises",
-        sets: 4,
-        reps: "12-15",
-        weight: "60 lbs",
-      },
-      {
-        id: "e18",
-        name: "Reverse Pec Deck",
-        sets: 3,
-        reps: "12-15",
-        weight: "200 lbs",
-      },
-      {
-        id: "e19",
-        name: "Cable Lateral Raises",
-        sets: 3,
-        reps: "15-20",
-        weight: "30 lbs",
-      },
-      {
-        id: "e20",
-        name: "Weighted Ab Dips",
-        sets: 3,
-        reps: "12-15",
-        weight: "45 lbs",
-      },
-    ],
-    notes: "Shoulders feeling great! Continue with drop sets next session.",
-  },
-  {
-    id: "w5",
-    userId: "1",
-    name: "Cardio & Conditioning",
-    date: "2024-02-08",
-    startTime: "07:00 AM",
-    endTime: "08:00 AM",
-    duration: 60,
-    caloriesBurned: 520,
-    exercises: [
-      {
-        id: "e21",
-        name: "Treadmill Running",
-        sets: 1,
-        reps: "5km",
-        duration: "35",
-      },
-      {
-        id: "e22",
-        name: "Battle Ropes",
-        sets: 4,
-        reps: "45s",
-        duration: "10",
-      },
-      {
-        id: "e23",
-        name: "Jump Rope",
-        sets: 5,
-        reps: "100 reps",
-        duration: "10",
-      },
-    ],
-    notes:
-      "Solid cardio session. Maintaining good cardiovascular fitness during bulk.",
+    notes: undefined,
   },
 ];
 
@@ -1156,7 +1024,35 @@ export function getUserProfile(userId: string) {
  * Get all workouts for a specific user
  */
 export function getWorkoutsByUserId(userId: string): Workout[] {
-  return [];
+  return WORKOUTS.filter((w) => w.userId === userId);
+}
+
+/**
+ * Simple listener API - notify when workouts mutates (in-memory)
+ */
+let _workoutsListeners: Array<() => void> = [];
+export function addWorkoutsListener(fn: () => void) {
+  _workoutsListeners.push(fn);
+  return () => {
+    _workoutsListeners = _workoutsListeners.filter((f) => f !== fn);
+  };
+}
+function _notifyWorkouts() {
+  _workoutsListeners.forEach((f) => {
+    try {
+      f();
+    } catch {
+      /* ignore */
+    }
+  });
+}
+
+/**
+ * Add a new workout (in-memory)
+ */
+export function addWorkout(workout: Workout): void {
+  WORKOUTS.unshift(workout); // add to the front so it appears in Recent Workouts
+  _notifyWorkouts();
 }
 
 /**
@@ -1205,4 +1101,11 @@ export function getRoutineById(routineId: string): Routine | undefined {
  */
 export function getAllRoutines(): Routine[] {
   return ROUTINES;
+}
+
+/**
+ * Add a new routine (in-memory)
+ */
+export function addRoutine(routine: Routine): void {
+  ROUTINES.push(routine);
 }

@@ -8,7 +8,6 @@ import React, {
   forwardRef,
   useCallback,
   useEffect,
-  useMemo,
   useRef,
   useState,
 } from "react";
@@ -18,6 +17,7 @@ import {
   Pressable,
   StyleSheet,
   Text,
+  TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
@@ -111,6 +111,10 @@ const ActiveWorkoutSheet = forwardRef<BottomSheet, ActiveWorkoutSheetProps>(
       reorderExercise,
     } = useActiveWorkout();
 
+    // ── Workout name ──────────────────────────────────────────────────────
+    const [saveModalVisible, setSaveModalVisible] = useState(false);
+    const [tempWorkoutName, setTempWorkoutName] = useState("");
+
     const handleDiscard = useCallback(() => {
       Alert.alert(
         "Discard Workout",
@@ -130,6 +134,50 @@ const ActiveWorkoutSheet = forwardRef<BottomSheet, ActiveWorkoutSheetProps>(
     }, [discardWorkout, setIsExpanded]);
 
     const handleSave = useCallback(() => {
+      setTempWorkoutName(`Workout ${new Date().toLocaleDateString()}`);
+      setSaveModalVisible(true);
+    }, []);
+
+    const handleConfirmSave = useCallback(() => {
+      if (!activeWorkout) return;
+
+      // Map active workout -> mockData.Workout
+      const toSave = {
+        id: `w-${Date.now()}`,
+        userId: "1",
+        name: tempWorkoutName,
+        date: new Date().toISOString().split("T")[0],
+        startTime: new Date().toLocaleTimeString([], {
+          hour: "2-digit",
+          minute: "2-digit",
+        }),
+        endTime: new Date().toLocaleTimeString([], {
+          hour: "2-digit",
+          minute: "2-digit",
+        }),
+        duration: Math.max(0, Math.round(activeWorkout.duration / 60)),
+        caloriesBurned: 0,
+        exercises: activeWorkout.exercises.map((ex) => ({
+          id: ex.id,
+          name: ex.name,
+          sets: ex.sets.length,
+          reps: ex.sets[0]?.reps || "",
+          weight: ex.sets[0]?.kg ? `${ex.sets[0].kg} kg` : undefined,
+        })),
+        notes: undefined,
+      };
+
+      // Persist in-memory and close
+      try {
+        // lazy-import to avoid circulars
+        // eslint-disable-next-line @typescript-eslint/no-var-requires
+        const { addWorkout } = require("../../data/mockData");
+        addWorkout(toSave);
+      } catch (err) {
+        console.warn("addWorkout failed:", err);
+      }
+
+      setSaveModalVisible(false);
       Alert.alert("Save Workout", "Workout saved successfully!", [
         {
           text: "OK",
@@ -139,10 +187,9 @@ const ActiveWorkoutSheet = forwardRef<BottomSheet, ActiveWorkoutSheetProps>(
           },
         },
       ]);
-    }, [discardWorkout, setIsExpanded]);
+    }, [activeWorkout, discardWorkout, setIsExpanded, tempWorkoutName]);
 
-    const snapPoints = useMemo(() => ["100%"], []);
-
+    const snapPoints = ["100%"];
     // ── Rest timer ────────────────────────────────────────────────────────────
     const [restActive, setRestActive] = useState(false);
     const [restElapsed, setRestElapsed] = useState(0);
@@ -518,6 +565,46 @@ const ActiveWorkoutSheet = forwardRef<BottomSheet, ActiveWorkoutSheetProps>(
           </BottomSheetScrollView>
         </BottomSheet>
 
+        {/* ── Save workout modal ─────────────────────────────────────────── */}
+        <Modal
+          transparent
+          visible={saveModalVisible}
+          animationType="fade"
+          onRequestClose={() => setSaveModalVisible(false)}
+        >
+          <Pressable
+            style={styles.modalOverlay}
+            onPress={() => setSaveModalVisible(false)}
+          >
+            <View style={styles.saveModalContent}>
+              <Text style={styles.saveModalTitle}>Save Workout</Text>
+              <TextInput
+                style={styles.saveModalInput}
+                value={tempWorkoutName}
+                onChangeText={setTempWorkoutName}
+                placeholder="Enter workout name"
+                placeholderTextColor={theme.foreground.gray}
+                selectTextOnFocus
+                autoFocus
+              />
+              <View style={styles.saveModalButtons}>
+                <TouchableOpacity
+                  style={[styles.saveModalButton, styles.cancelButton]}
+                  onPress={() => setSaveModalVisible(false)}
+                >
+                  <Text style={styles.cancelButtonText}>Cancel</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[styles.saveModalButton, styles.confirmButton]}
+                  onPress={handleConfirmSave}
+                >
+                  <Text style={styles.confirmButtonText}>Save</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </Pressable>
+        </Modal>
+
         {/* ── Exercise options modal ─────────────────────────────────────── */}
         <ExerciseMenu
           visible={menuExerciseId !== null}
@@ -729,6 +816,63 @@ const createStyles = (theme: Theme) =>
       fontSize: 16,
       fontWeight: "700",
       color: theme.background.dark,
+    },
+    // Save modal
+    modalOverlay: {
+      flex: 1,
+      backgroundColor: "rgba(0,0,0,0.6)",
+      justifyContent: "center",
+      alignItems: "center",
+      padding: 20,
+    },
+    saveModalContent: {
+      backgroundColor: theme.background.darker,
+      borderRadius: 16,
+      padding: 24,
+      width: "100%",
+      maxWidth: 400,
+      gap: 20,
+    },
+    saveModalTitle: {
+      fontSize: 20,
+      fontWeight: "700",
+      color: theme.foreground.white,
+      textAlign: "center",
+    },
+    saveModalInput: {
+      borderWidth: 1,
+      borderColor: theme.primary.main,
+      borderRadius: 8,
+      padding: 12,
+      fontSize: 16,
+      color: theme.foreground.white,
+      backgroundColor: theme.background.dark,
+    },
+    saveModalButtons: {
+      flexDirection: "row",
+      gap: 12,
+    },
+    saveModalButton: {
+      flex: 1,
+      paddingVertical: 12,
+      borderRadius: 8,
+      alignItems: "center",
+    },
+    cancelButton: {
+      backgroundColor: theme.background.dark,
+    },
+    confirmButton: {
+      backgroundColor: theme.primary.main,
+    },
+    cancelButtonText: {
+      fontSize: 16,
+      fontWeight: "600",
+      color: theme.foreground.gray,
+    },
+    confirmButtonText: {
+      fontSize: 16,
+      fontWeight: "600",
+      color: theme.foreground.white,
     },
   });
 

@@ -1,7 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
-import React, { useEffect, useRef, useState } from "react";
+import { useFocusEffect, useRouter } from "expo-router";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
-  Alert,
   Modal,
   Pressable,
   ScrollView,
@@ -10,8 +10,11 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import RoutineCard from "../../components/ui/RoutineCard";
+import WorkoutCard from "../../components/ui/WorkoutCard";
 import { Theme } from "../../constants/themes";
 import { useActiveWorkout } from "../../contexts/ActiveWorkoutContext";
+import { useCreateRoutine } from "../../contexts/CreateRoutineContext";
 import { useTheme } from "../../contexts/ThemeContext";
 import {
   getRoutinesByUserId,
@@ -23,23 +26,46 @@ import {
 export default function Workout() {
   const { theme } = useTheme();
   const styles = createStyles(theme);
+  const router = useRouter();
   const [workouts, setWorkouts] = useState<WorkoutData[]>([]);
   const [routines, setRoutines] = useState<Routine[]>([]);
   const { startWorkout } = useActiveWorkout();
+  const { initCreation } = useCreateRoutine();
 
   const [plusModalVisible, setPlusModalVisible] = useState(false);
   const scrollRef = useRef<ScrollView | null>(null);
   const routinesSectionY = useRef<number>(0);
 
-  useEffect(() => {
-    // Simulating fetching workouts for current user (userId "1")
-    const userWorkouts = getWorkoutsByUserId("1");
-    setWorkouts(userWorkouts);
-
-    // Fetch user routines
-    const userRoutines = getRoutinesByUserId("1");
-    setRoutines(userRoutines);
+  const loadData = useCallback(() => {
+    setWorkouts(getWorkoutsByUserId("1"));
+    setRoutines(getRoutinesByUserId("1"));
   }, []);
+
+  useEffect(() => {
+    loadData();
+  }, [loadData]);
+
+  // Reload routines when screen comes back into focus (e.g. after saving one)
+  useFocusEffect(
+    useCallback(() => {
+      loadData();
+    }, [loadData]),
+  );
+
+  // Subscribe to in-memory workout changes so new saves show immediately
+  useEffect(() => {
+    // lazy-import listener helpers from mockData to avoid circular imports
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    const { addWorkoutsListener } = require("../../data/mockData");
+    const unsub = addWorkoutsListener(() => loadData());
+    return () => unsub();
+  }, [loadData]);
+
+  const handleCreateRoutine = () => {
+    setPlusModalVisible(false);
+    initCreation();
+    router.push("/create-routine" as any);
+  };
 
   const handleStartEmptyWorkout = () => {
     startWorkout({
@@ -95,13 +121,7 @@ export default function Workout() {
 
             <TouchableOpacity
               style={styles.modalOption}
-              onPress={() => {
-                setPlusModalVisible(false);
-                Alert.alert(
-                  "Create Routine",
-                  "Create routine flow not implemented yet",
-                );
-              }}
+              onPress={handleCreateRoutine}
             >
               <Text style={styles.modalOptionText}>Create Routine</Text>
             </TouchableOpacity>
@@ -165,7 +185,10 @@ export default function Workout() {
               <Text style={styles.actionButtonText}>Start Empty Workout</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity style={styles.actionButton}>
+            <TouchableOpacity
+              style={styles.actionButton}
+              onPress={handleCreateRoutine}
+            >
               <View style={[styles.actionBgIcon, { right: -14, bottom: -18 }]}>
                 <Ionicons
                   name="create-outline"
@@ -187,7 +210,7 @@ export default function Workout() {
         >
           <View style={styles.sectionHeader}>
             <Text style={styles.sectionTitle}>My Routines</Text>
-            <TouchableOpacity>
+            <TouchableOpacity onPress={() => router.push("/routines" as any)}>
               <Text style={styles.seeAllText}>See All</Text>
             </TouchableOpacity>
           </View>
@@ -210,73 +233,7 @@ export default function Workout() {
               contentContainerStyle={styles.routinesScroll}
             >
               {routines.map((routine) => (
-                <TouchableOpacity key={routine.id} style={styles.routineCard}>
-                  <View style={styles.routineHeader}>
-                    <Text style={styles.routineName}>{routine.name}</Text>
-                    <View
-                      style={[
-                        styles.difficultyBadge,
-                        styles[`difficulty_${routine.difficulty}`],
-                      ]}
-                    >
-                      <Text style={styles.difficultyText}>
-                        {routine.difficulty}
-                      </Text>
-                    </View>
-                  </View>
-
-                  <Text style={styles.routineDescription} numberOfLines={2}>
-                    {routine.description}
-                  </Text>
-
-                  <View style={styles.routineStats}>
-                    <View style={styles.routineStat}>
-                      <Ionicons
-                        name="time-outline"
-                        size={14}
-                        color={theme.foreground.gray}
-                      />
-                      <Text style={styles.routineStatText}>
-                        {routine.estimatedDuration}m
-                      </Text>
-                    </View>
-                    <View style={styles.routineStat}>
-                      <Ionicons
-                        name="barbell-outline"
-                        size={14}
-                        color={theme.foreground.gray}
-                      />
-                      <Text style={styles.routineStatText}>
-                        {routine.exercises.length} exercises
-                      </Text>
-                    </View>
-                  </View>
-
-                  <View style={styles.musclesContainer}>
-                    {routine.targetMuscles.slice(0, 3).map((muscle, index) => (
-                      <View key={index} style={styles.muscleTag}>
-                        <Text style={styles.muscleTagText}>{muscle}</Text>
-                      </View>
-                    ))}
-                  </View>
-
-                  {routine.timesCompleted > 0 && (
-                    <Text style={styles.completedText}>
-                      Completed {routine.timesCompleted}x
-                    </Text>
-                  )}
-
-                  <TouchableOpacity style={styles.startRoutineButton}>
-                    <Text style={styles.startRoutineButtonText}>
-                      Start Routine
-                    </Text>
-                    <Ionicons
-                      name="arrow-forward"
-                      size={16}
-                      color={theme.background.dark}
-                    />
-                  </TouchableOpacity>
-                </TouchableOpacity>
+                <RoutineCard key={routine.id} routine={routine} />
               ))}
             </ScrollView>
           )}
@@ -287,75 +244,14 @@ export default function Workout() {
           <View style={styles.section}>
             <View style={styles.sectionHeader}>
               <Text style={styles.sectionTitle}>Recent Workouts</Text>
-              <TouchableOpacity>
+              <TouchableOpacity onPress={() => router.push("/workouts" as any)}>
                 <Text style={styles.seeAllText}>See All</Text>
               </TouchableOpacity>
             </View>
 
             <View style={styles.workoutsList}>
               {workouts.map((workout) => (
-                <View key={workout.id} style={styles.workoutCard}>
-                  <View style={styles.workoutHeader}>
-                    <View>
-                      <Text style={styles.workoutName}>{workout.name}</Text>
-                      <Text style={styles.workoutDate}>{workout.date}</Text>
-                    </View>
-                    <View style={styles.workoutMeta}>
-                      <View style={styles.metaItem}>
-                        <Ionicons
-                          name="time"
-                          size={16}
-                          color={theme.primary.main}
-                        />
-                        <Text style={styles.metaText}>{workout.duration}m</Text>
-                      </View>
-                      <View style={styles.metaItem}>
-                        <Ionicons
-                          name="flame"
-                          size={16}
-                          color={theme.primary.main}
-                        />
-                        <Text style={styles.metaText}>
-                          {workout.caloriesBurned}
-                        </Text>
-                      </View>
-                    </View>
-                  </View>
-
-                  <View style={styles.exercisesContainer}>
-                    <Text style={styles.exercisesTitle}>
-                      {workout.exercises.length} Exercises
-                    </Text>
-                    {workout.exercises.slice(0, 3).map((exercise) => (
-                      <View key={exercise.id} style={styles.exerciseItem}>
-                        <Text style={styles.exerciseName}>{exercise.name}</Text>
-                        <View style={styles.exerciseDetails}>
-                          {exercise.sets && (
-                            <Text style={styles.exerciseDetail}>
-                              {exercise.sets}x{exercise.reps}
-                            </Text>
-                          )}
-                          {exercise.weight && (
-                            <Text style={styles.exerciseDetail}>
-                              {exercise.weight}
-                            </Text>
-                          )}
-                        </View>
-                      </View>
-                    ))}
-                    {workout.exercises.length > 3 && (
-                      <Text style={styles.moreExercises}>
-                        +{workout.exercises.length - 3} more exercises
-                      </Text>
-                    )}
-                  </View>
-
-                  {workout.notes && (
-                    <View style={styles.notesContainer}>
-                      <Text style={styles.notesText}>{workout.notes}</Text>
-                    </View>
-                  )}
-                </View>
+                <WorkoutCard key={workout.id} workout={workout} />
               ))}
             </View>
           </View>
@@ -620,100 +516,100 @@ const createStyles = (theme: Theme) =>
     },
     // Workouts List
     workoutsList: {
-      paddingHorizontal: 12,
+      paddingHorizontal: 16, // Use same standard padding as routines
+      gap: 16,
     },
     workoutCard: {
       backgroundColor: theme.background.darker,
-      borderRadius: 12,
+      borderRadius: 16,
       padding: 16,
-      marginBottom: 12,
-      borderLeftWidth: 4,
-      borderLeftColor: theme.primary.main,
+      // Remove borderLeftWidth to match Routine card style
+      // Instead, use a shadow or subtle border
+      borderWidth: 1,
+      borderColor: theme.background.dark,
     },
     workoutHeader: {
       flexDirection: "row",
       justifyContent: "space-between",
-      alignItems: "flex-start",
-      marginBottom: 16,
+      marginBottom: 12,
+    },
+    workoutTitleContainer: {
+      flex: 1,
+      paddingRight: 12,
     },
     workoutName: {
       fontSize: 18,
       fontWeight: "700",
       color: theme.foreground.white,
-    },
-    workoutDate: {
-      fontSize: 14,
-      color: theme.foreground.gray,
-      marginTop: 4,
-    },
-    workoutMeta: {
-      flexDirection: "row",
-      gap: 12,
-    },
-    metaItem: {
-      flexDirection: "row",
-      alignItems: "center",
-      gap: 4,
-      backgroundColor: theme.background.dark,
-      paddingHorizontal: 8,
-      paddingVertical: 6,
-      borderRadius: 6,
-    },
-    metaText: {
-      fontSize: 12,
-      fontWeight: "600",
-      color: theme.foreground.white,
-    },
-    exercisesContainer: {
-      marginBottom: 12,
-    },
-    exercisesTitle: {
-      fontSize: 14,
-      fontWeight: "600",
-      color: theme.primary.main,
-      marginBottom: 8,
-      textTransform: "uppercase",
-    },
-    exerciseItem: {
-      marginBottom: 8,
-      paddingVertical: 8,
-      borderBottomWidth: 1,
-      borderBottomColor: theme.background.dark,
-    },
-    exerciseName: {
-      fontSize: 15,
-      fontWeight: "600",
-      color: theme.foreground.white,
       marginBottom: 4,
     },
-    exerciseDetails: {
+    workoutDate: {
+      fontSize: 13,
+      color: theme.foreground.gray,
+    },
+    workoutDurationBadge: {
       flexDirection: "row",
-      gap: 12,
-    },
-    exerciseDetail: {
-      fontSize: 13,
-      color: theme.foreground.gray,
+      alignItems: "center",
       backgroundColor: theme.background.dark,
-      paddingHorizontal: 8,
-      paddingVertical: 4,
-      borderRadius: 4,
-    },
-    moreExercises: {
-      fontSize: 13,
-      color: theme.primary.main,
-      fontWeight: "600",
-      marginTop: 4,
-    },
-    notesContainer: {
-      backgroundColor: theme.background.dark,
-      padding: 10,
+      paddingHorizontal: 10,
+      paddingVertical: 6,
       borderRadius: 8,
-      borderLeftWidth: 2,
-      borderLeftColor: theme.primary.main,
+      gap: 4,
+      alignSelf: "flex-start",
     },
-    notesText: {
+    workoutDurationText: {
       fontSize: 13,
+      fontWeight: "600",
+      color: theme.primary.main,
+    },
+    workoutStatsRow: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 12,
+      marginBottom: 16,
+    },
+    workoutStat: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 6,
+    },
+    workoutStatDivider: {
+      width: 1,
+      height: 12,
+      backgroundColor: theme.foreground.gray,
+      opacity: 0.3,
+    },
+    workoutStatText: {
+      fontSize: 13,
+      fontWeight: "500",
       color: theme.foreground.gray,
-      fontStyle: "italic",
+    },
+    workoutExercisesTags: {
+      flexDirection: "row",
+      flexWrap: "wrap",
+      gap: 8,
+    },
+    workoutExerciseTag: {
+      backgroundColor: theme.background.dark,
+      paddingHorizontal: 10,
+      paddingVertical: 6,
+      borderRadius: 8,
+    },
+    workoutExerciseTagText: {
+      fontSize: 12,
+      color: theme.foreground.white,
+      fontWeight: "500",
+    },
+    workoutExerciseMoreTag: {
+      backgroundColor: theme.background.dark,
+      paddingHorizontal: 10,
+      paddingVertical: 6,
+      borderRadius: 8,
+      opacity: 0.7,
+    },
+    workoutExerciseMoreText: {
+      fontSize: 12,
+      color: theme.foreground.gray,
+      fontWeight: "600",
     },
   });

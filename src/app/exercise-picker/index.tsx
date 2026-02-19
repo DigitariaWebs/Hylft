@@ -15,6 +15,7 @@ import {
 import ExerciseFilterSheet from "../../components/ui/ExerciseFilterSheet";
 import { Theme } from "../../constants/themes";
 import { useActiveWorkout } from "../../contexts/ActiveWorkoutContext";
+import { useCreateRoutine } from "../../contexts/CreateRoutineContext";
 import { useTheme } from "../../contexts/ThemeContext";
 import {
   Difficulty,
@@ -52,6 +53,7 @@ export default function ExercisePicker() {
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
 
   const { addExerciseToWorkout } = useActiveWorkout();
+  const { isCreating, addExercisesToRoutine } = useCreateRoutine();
 
   // Filter state
   const filterSheetRef = useRef<BottomSheet>(null);
@@ -325,7 +327,11 @@ export default function ExercisePicker() {
   const handleAddSelected = () => {
     if (selectedIds.length === 0) return;
     const toAdd = exercises.filter((e) => selectedIds.includes(e.id));
-    toAdd.forEach((ex) => addExerciseToWorkout(ex));
+    if (isCreating) {
+      addExercisesToRoutine(toAdd);
+    } else {
+      toAdd.forEach((ex) => addExerciseToWorkout(ex));
+    }
     router.back();
   };
 
@@ -465,13 +471,7 @@ export default function ExercisePicker() {
               <View style={styles.bulkFooter} pointerEvents="box-none">
                 <TouchableOpacity
                   style={styles.addSelectedButton}
-                  onPress={() => {
-                    const toAdd = exercises.filter((e) =>
-                      selectedIds.includes(e.id),
-                    );
-                    toAdd.forEach((ex) => addExerciseToWorkout(ex));
-                    router.back();
-                  }}
+                  onPress={handleAddSelected}
                   activeOpacity={0.85}
                 >
                   <Ionicons
