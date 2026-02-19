@@ -152,12 +152,7 @@ export default function Workout() {
           {/* Row 1: full-width Explore */}
           <TouchableOpacity
             style={[styles.actionButton, styles.actionButtonFull]}
-            onPress={() =>
-              scrollRef.current?.scrollTo({
-                y: routinesSectionY.current,
-                animated: true,
-              })
-            }
+            onPress={() => router.push("/explore-routines" as any)}
           >
             <View style={[styles.actionBgIcon, { right: -12, bottom: -20 }]}>
               <Ionicons
@@ -166,7 +161,12 @@ export default function Workout() {
                 color={theme.primary.main}
               />
             </View>
-            <Text style={styles.actionButtonText}>Explore Routines</Text>
+            <View style={{ alignItems: "center", gap: 2 }}>
+              <Text style={styles.actionButtonText}>Explore Routines</Text>
+              <Text style={styles.actionButtonSub}>
+                Browse community templates
+              </Text>
+            </View>
           </TouchableOpacity>
 
           {/* Row 2: two buttons side-by-side */}
@@ -372,6 +372,11 @@ const createStyles = (theme: Theme) =>
       fontSize: 13,
       fontWeight: "600",
       color: theme.foreground.white,
+      textAlign: "center",
+    },
+    actionButtonSub: {
+      fontSize: 11,
+      color: theme.foreground.gray,
       textAlign: "center",
     },
     // Sections
