@@ -1,75 +1,113 @@
-import { Ionicons } from "@expo/vector-icons";
+﻿import { Ionicons } from "@expo/vector-icons";
+import BottomSheet from "@gorhom/bottom-sheet";
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
-    ActivityIndicator,
-    FlatList,
-    SafeAreaView,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  ActivityIndicator,
+  FlatList,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from "react-native";
+import ExerciseFilterSheet from "../../components/ui/ExerciseFilterSheet";
 import { Theme } from "../../constants/themes";
 import { useActiveWorkout } from "../../contexts/ActiveWorkoutContext";
 import { useTheme } from "../../contexts/ThemeContext";
 import {
-    fetchExercises,
-    searchExercises,
-    WgerExerciseInfo,
-    WgerSearchSuggestion,
-} from "../../services/wgerApi";
+  Difficulty,
+  ExerciseDbExercise,
+  fetchExercisesByEquipmentExerciseDb,
+  fetchExercisesExerciseDb,
+  getAvailableBodyPartsExerciseDb,
+  getAvailableEquipmentsExerciseDb,
+  searchExercisesByBodyPartExerciseDb,
+  searchExercisesExerciseDb,
+} from "../../services/exerciseDbApi";
 
-// ─── Types ────────────────────────────────────────────────────────────────────
+const DIFFICULTY_COLORS: Record<Difficulty, string> = {
+  beginner: "#4CAF50",
+  intermediate: "#FF9800",
+  advanced: "#F44336",
+};
 
-const WGER_BASE = "https://wger.de";
-
-// ─── Component ────────────────────────────────────────────────────────────────
+type FilterTab = "bodyPart" | "equipment" | "difficulty";
 
 export default function ExercisePicker() {
   const router = useRouter();
   const { theme } = useTheme();
-  const { addExerciseToWorkout } = useActiveWorkout();
   const styles = createStyles(theme);
 
-  // ── state ──
+  // Main state
   const [searchQuery, setSearchQuery] = useState("");
-  const [exercises, setExercises] = useState<WgerExerciseInfo[]>([]);
-  const [searchResults, setSearchResults] = useState<WgerSearchSuggestion[]>(
-    [],
-  );
-
+  const [exercises, setExercises] = useState<ExerciseDbExercise[]>([]);
   const [loading, setLoading] = useState(false);
   const [loadingMore, setLoadingMore] = useState(false);
-  const [page, setPage] = useState(1);
+  const [page, setPage] = useState(0);
   const [hasMore, setHasMore] = useState(true);
 
-  const searchTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const isSearchMode = searchQuery.trim().length > 0;
+  // multi-select state (select rows to add in bulk)
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
 
-  // ── initial + category-change load ──
+  const { addExerciseToWorkout } = useActiveWorkout();
+
+  // Filter state
+  const filterSheetRef = useRef<BottomSheet>(null);
+  const [filterSheetOpen, setFilterSheetOpen] = useState(false);
+  const [activeFilterTab, setActiveFilterTab] = useState<FilterTab>("bodyPart");
+  const [selectedBodyPart, setSelectedBodyPart] = useState<string | null>(null);
+  const [selectedEquipment, setSelectedEquipment] = useState<string | null>(
+    null,
+  );
+  const [selectedDifficulty, setSelectedDifficulty] =
+    useState<Difficulty | null>(null);
+  const [bodyParts, setBodyParts] = useState<string[]>([]);
+  const [equipments, setEquipments] = useState<string[]>([]);
+
+  const searchTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const hasActiveFilters =
+    selectedBodyPart !== null ||
+    selectedEquipment !== null ||
+    selectedDifficulty !== null;
+
+  const isSearchMode = searchQuery.trim().length > 0;
+  const activeFilterCount =
+    (selectedBodyPart ? 1 : 0) +
+    (selectedEquipment ? 1 : 0) +
+    (selectedDifficulty ? 1 : 0);
+
+  // Load filter options
+  useEffect(() => {
+    Promise.all([
+      getAvailableBodyPartsExerciseDb(),
+      getAvailableEquipmentsExerciseDb(),
+    ]).then(([bp, eq]) => {
+      setBodyParts(bp);
+      setEquipments(eq);
+    });
+  }, []);
+
+  // Load exercises (paginated)
   const loadExercises = useCallback(
     async (reset = false) => {
-      const targetPage = reset ? 1 : page;
+      const targetPage = reset ? 0 : page;
       if (!reset && !hasMore) return;
-
       reset ? setLoading(true) : setLoadingMore(true);
-
       try {
-        const result = await fetchExercises({
+        const result = await fetchExercisesExerciseDb({
           page: targetPage,
           limit: 20,
         });
-
         setExercises((prev) =>
           reset ? result.exercises : [...prev, ...result.exercises],
         );
         setHasMore(result.hasMore);
-        setPage(reset ? 2 : targetPage + 1);
+        setPage(reset ? 1 : targetPage + 1);
       } catch {
-        // silently ignore network errors — show whatever is cached
+        /* silently ignore */
       } finally {
         setLoading(false);
         setLoadingMore(false);
@@ -79,28 +117,53 @@ export default function ExercisePicker() {
   );
 
   useEffect(() => {
-    if (!isSearchMode) {
+    if (!isSearchMode && !hasActiveFilters) {
       loadExercises(true);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // ── search debounce ──
+  // Client-side filter helper
+  function applyClientFilters(items: ExerciseDbExercise[]) {
+    let out = items;
+    if (selectedBodyPart) {
+      out = out.filter(
+        (e) =>
+          e.bodyPart.toLowerCase() === selectedBodyPart.toLowerCase() ||
+          e.allBodyParts.some(
+            (bp) => bp.toLowerCase() === selectedBodyPart.toLowerCase(),
+          ),
+      );
+    }
+    if (selectedEquipment) {
+      out = out.filter(
+        (e) =>
+          e.equipment.toLowerCase() === selectedEquipment.toLowerCase() ||
+          e.allEquipments.some(
+            (eq) => eq.toLowerCase() === selectedEquipment.toLowerCase(),
+          ),
+      );
+    }
+    if (selectedDifficulty) {
+      out = out.filter((e) => e.difficulty === selectedDifficulty);
+    }
+    return out;
+  }
+
+  // Search debounce
   useEffect(() => {
     if (searchTimeout.current) clearTimeout(searchTimeout.current);
-
-    if (!searchQuery.trim()) {
-      setSearchResults([]);
-      return;
-    }
+    if (!searchQuery.trim()) return;
 
     searchTimeout.current = setTimeout(async () => {
       setLoading(true);
       try {
-        const results = await searchExercises(searchQuery);
-        setSearchResults(results);
+        let results = await searchExercisesExerciseDb(searchQuery);
+        results = applyClientFilters(results);
+        setExercises(results);
+        setHasMore(false);
       } catch {
-        setSearchResults([]);
+        setExercises([]);
       } finally {
         setLoading(false);
       }
@@ -109,38 +172,96 @@ export default function ExercisePicker() {
     return () => {
       if (searchTimeout.current) clearTimeout(searchTimeout.current);
     };
-  }, [searchQuery]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchQuery, selectedBodyPart, selectedEquipment, selectedDifficulty]);
 
-  // ── helpers ──
-  const getExerciseImage = (ex: WgerExerciseInfo): string | null => {
-    const main = ex.images.find((img) => img.is_main) ?? ex.images[0];
-    if (!main) return null;
-    return main.image.startsWith("http")
-      ? main.image
-      : `${WGER_BASE}${main.image}`;
+  // Filter mode fetch
+  useEffect(() => {
+    if (searchQuery.trim()) return;
+
+    if (!hasActiveFilters) {
+      setPage(0);
+      setHasMore(true);
+      loadExercises(true);
+      return;
+    }
+
+    (async () => {
+      setLoading(true);
+      try {
+        let results: ExerciseDbExercise[] = [];
+
+        // Fetch a broad base of exercises
+        if (selectedBodyPart) {
+          // If body part selected, get all exercises for that body part
+          results = await searchExercisesByBodyPartExerciseDb(selectedBodyPart);
+        } else if (selectedEquipment) {
+          // If equipment selected, get all exercises for that equipment
+          results =
+            await fetchExercisesByEquipmentExerciseDb(selectedEquipment);
+        } else {
+          // If only difficulty or no specific filter, get a large set
+          const broad = await fetchExercisesExerciseDb({ page: 0, limit: 100 });
+          results = broad.exercises;
+        }
+
+        // Apply ALL selected filters (even if we already fetched for one, apply the others too)
+        results = applyClientFilters(results);
+        setExercises(results);
+        setHasMore(false);
+      } catch (error) {
+        console.error("Filter fetch error:", error);
+        setExercises([]);
+      } finally {
+        setLoading(false);
+      }
+    })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedBodyPart, selectedEquipment, selectedDifficulty]);
+
+  // Clear all filters
+  const clearAllFilters = () => {
+    setSelectedBodyPart(null);
+    setSelectedEquipment(null);
+    setSelectedDifficulty(null);
   };
 
-  // ── render rows ──
+  // Render exercise card
   const renderExerciseRow = useCallback(
-    ({ item }: { item: WgerExerciseInfo }) => {
-      const imageUri = getExerciseImage(item);
-      const muscles = item.muscles.map((m) => m.name).join(", ") || "—";
-      const equipment =
-        item.equipment.map((e) => e.name).join(", ") || "Bodyweight";
+    ({ item }: { item: ExerciseDbExercise }) => {
+      const diffColor = DIFFICULTY_COLORS[item.difficulty];
+      const idKey = item.id;
+      const isSelected = selectedIds.includes(idKey);
+
+      const toggle = () => {
+        setSelectedIds((prev) =>
+          prev.includes(idKey)
+            ? prev.filter((p) => p !== idKey)
+            : [...prev, idKey],
+        );
+      };
+
+      const handleNavigateDetail = () =>
+        router.navigate({
+          pathname: "/exercise-picker/[id]",
+          params: { id: item.id, exercise: JSON.stringify(item) },
+        });
 
       return (
         <TouchableOpacity
-          style={styles.exerciseRow}
-          onPress={() => {
-            addExerciseToWorkout(item);
-            router.back();
-          }}
-          activeOpacity={0.7}
+          style={[styles.exerciseRow, isSelected && styles.exerciseRowSelected]}
+          onPress={toggle}
+          activeOpacity={0.8}
         >
-          <View style={styles.exerciseThumbnailContainer}>
-            {imageUri ? (
+          <View
+            style={[
+              styles.exerciseThumbnailContainer,
+              { borderWidth: 2, borderColor: diffColor },
+            ]}
+          >
+            {item.gifUrl ? (
               <Image
-                source={{ uri: imageUri }}
+                source={{ uri: item.gifUrl }}
                 style={styles.exerciseThumbnail}
                 contentFit="cover"
                 transition={200}
@@ -151,6 +272,16 @@ export default function ExercisePicker() {
                   name="barbell-outline"
                   size={28}
                   color={theme.foreground.gray}
+                />
+              </View>
+            )}
+
+            {isSelected && (
+              <View style={styles.selectedOverlay}>
+                <Ionicons
+                  name="checkmark-circle"
+                  size={20}
+                  color={theme.primary.main}
                 />
               </View>
             )}
@@ -161,188 +292,229 @@ export default function ExercisePicker() {
               {item.name}
             </Text>
             <Text style={styles.exerciseMeta} numberOfLines={1}>
-              {item.category?.name ?? ""} · {muscles}
-            </Text>
-            <Text style={styles.exerciseEquipment} numberOfLines={1}>
-              {equipment}
+              {item.target} · {item.bodyPart}
             </Text>
           </View>
 
-          <Ionicons
-            name="add-circle-outline"
-            size={26}
-            color={theme.primary.main}
-          />
+          <TouchableOpacity
+            onPress={handleNavigateDetail}
+            hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+            accessibilityLabel={`More info about ${item.name}`}
+          >
+            <Ionicons
+              name="help-circle-outline"
+              size={26}
+              color={theme.primary.main}
+            />
+          </TouchableOpacity>
         </TouchableOpacity>
       );
     },
-    [styles, theme, addExerciseToWorkout, router],
+    [styles, theme, router, selectedIds],
   );
 
-  const renderSearchRow = useCallback(
-    ({ item }: { item: WgerSearchSuggestion }) => {
-      const imageUri = item.data.image
-        ? item.data.image.startsWith("http")
-          ? item.data.image
-          : `${WGER_BASE}${item.data.image}`
-        : null;
-
-      return (
-        <TouchableOpacity
-          style={styles.exerciseRow}
-          onPress={() => {
-            addExerciseToWorkout(item);
-            router.back();
-          }}
-          activeOpacity={0.7}
-        >
-          <View style={styles.exerciseThumbnailContainer}>
-            {imageUri ? (
-              <Image
-                source={{ uri: imageUri }}
-                style={styles.exerciseThumbnail}
-                contentFit="cover"
-                transition={200}
-              />
-            ) : (
-              <View style={styles.exerciseThumbnailPlaceholder}>
-                <Ionicons
-                  name="barbell-outline"
-                  size={28}
-                  color={theme.foreground.gray}
-                />
-              </View>
-            )}
-          </View>
-
-          <View style={styles.exerciseInfo}>
-            <Text style={styles.exerciseName} numberOfLines={1}>
-              {item.data.name}
-            </Text>
-            <Text style={styles.exerciseMeta} numberOfLines={1}>
-              {item.data.category}
-            </Text>
-          </View>
-
-          <Ionicons
-            name="add-circle-outline"
-            size={26}
-            color={theme.primary.main}
-          />
-        </TouchableOpacity>
-      );
-    },
-    [styles, theme, addExerciseToWorkout, router],
-  );
-
-  const renderFooter = () => {
-    if (!loadingMore) return null;
-    return (
+  const renderFooter = () =>
+    loadingMore ? (
       <ActivityIndicator
         size="small"
         color={theme.primary.main}
         style={{ marginVertical: 16 }}
       />
-    );
+    ) : null;
+
+  const handleAddSelected = () => {
+    if (selectedIds.length === 0) return;
+    const toAdd = exercises.filter((e) => selectedIds.includes(e.id));
+    toAdd.forEach((ex) => addExerciseToWorkout(ex));
+    router.back();
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity
-          onPress={() => router.back()}
-          style={styles.backButton}
-        >
-          <Ionicons
-            name="arrow-back"
-            size={24}
-            color={theme.foreground.white}
-          />
-        </TouchableOpacity>
-        <Text style={styles.title}>Add Exercise</Text>
-        <View style={{ width: 40 }} />
-      </View>
-
-      {/* Search bar */}
-      <View style={styles.searchContainer}>
-        <Ionicons
-          name="search-outline"
-          size={20}
-          color={theme.foreground.gray}
-          style={styles.searchIcon}
-        />
-        <TextInput
-          style={styles.searchInput}
-          placeholder="Search exercises…"
-          placeholderTextColor={theme.foreground.gray}
-          value={searchQuery}
-          onChangeText={setSearchQuery}
-          returnKeyType="search"
-          autoCorrect={false}
-          autoCapitalize="none"
-        />
-        {searchQuery.length > 0 && (
-          <TouchableOpacity onPress={() => setSearchQuery("")}>
+    <>
+      <View style={styles.container}>
+        {/* Header */}
+        <View style={styles.header}>
+          <TouchableOpacity
+            onPress={() => router.back()}
+            style={styles.backButton}
+          >
             <Ionicons
-              name="close-circle"
-              size={20}
-              color={theme.foreground.gray}
+              name="arrow-back"
+              size={24}
+              color={theme.foreground.white}
             />
           </TouchableOpacity>
-        )}
-      </View>
-
-      {/* List */}
-      {loading && (exercises.length === 0 || isSearchMode) ? (
-        <View style={styles.centered}>
-          <ActivityIndicator size="large" color={theme.primary.main} />
+          <Text style={styles.title}>Add Exercise</Text>
+          <View style={{ width: 40 }} />
         </View>
-      ) : isSearchMode ? (
-        searchResults.length === 0 && !loading ? (
+
+        {/* Search + Filter row */}
+        <View style={styles.searchRow}>
+          <View style={styles.searchContainer}>
+            <Ionicons
+              name="search-outline"
+              size={20}
+              color={theme.foreground.gray}
+              style={styles.searchIcon}
+            />
+            <TextInput
+              style={styles.searchInput}
+              placeholder="Search exercise"
+              placeholderTextColor={theme.foreground.gray}
+              value={searchQuery}
+              onChangeText={setSearchQuery}
+              returnKeyType="search"
+              autoCorrect={false}
+              autoCapitalize="none"
+            />
+            {searchQuery.length > 0 && (
+              <TouchableOpacity onPress={() => setSearchQuery("")}>
+                <Ionicons
+                  name="close-circle"
+                  size={20}
+                  color={theme.foreground.gray}
+                />
+              </TouchableOpacity>
+            )}
+          </View>
+
+          {/* Filter button */}
+          <TouchableOpacity
+            style={[
+              styles.filterButton,
+              (filterSheetOpen || hasActiveFilters) &&
+                styles.filterButtonActive,
+            ]}
+            onPress={() => {
+              if (filterSheetOpen) {
+                filterSheetRef.current?.close();
+                setFilterSheetOpen(false);
+              } else {
+                filterSheetRef.current?.expand();
+                setFilterSheetOpen(true);
+              }
+            }}
+          >
+            <Ionicons
+              name="options-outline"
+              size={22}
+              color={
+                filterSheetOpen || hasActiveFilters
+                  ? theme.background.dark
+                  : theme.foreground.white
+              }
+            />
+            {activeFilterCount > 0 && (
+              <View style={styles.filterBadge}>
+                <Text style={styles.filterBadgeText}>{activeFilterCount}</Text>
+              </View>
+            )}
+          </TouchableOpacity>
+        </View>
+
+        {/* Active filter summary chips - REMOVED */}
+
+        {/* Exercise list */}
+        {loading && exercises.length === 0 ? (
+          <View style={styles.centered}>
+            <ActivityIndicator size="large" color={theme.primary.main} />
+          </View>
+        ) : exercises.length === 0 && !loading ? (
           <View style={styles.centered}>
             <Ionicons
               name="search-outline"
               size={48}
               color={theme.foreground.gray}
             />
-            <Text style={styles.emptyText}>No results found</Text>
+            <Text style={styles.emptyText}>No exercises found</Text>
+            {hasActiveFilters && (
+              <TouchableOpacity
+                style={styles.emptyResetButton}
+                onPress={clearAllFilters}
+              >
+                <Text style={styles.emptyResetText}>Clear filters</Text>
+              </TouchableOpacity>
+            )}
           </View>
         ) : (
-          <FlatList
-            data={searchResults}
-            keyExtractor={(item, index) => `search-${item.data.id}-${index}`}
-            renderItem={renderSearchRow}
-            contentContainerStyle={styles.listContent}
-            keyboardShouldPersistTaps="handled"
-          />
-        )
-      ) : (
-        <FlatList
-          data={exercises}
-          keyExtractor={(item, index) => `exercise-${item.uuid}-${index}`}
-          renderItem={renderExerciseRow}
-          contentContainerStyle={styles.listContent}
-          onEndReachedThreshold={0.3}
-          onEndReached={() => {
-            if (!loadingMore && hasMore) loadExercises(false);
-          }}
-          ListFooterComponent={renderFooter}
-          keyboardShouldPersistTaps="handled"
-        />
-      )}
-    </SafeAreaView>
+          <>
+            <FlatList
+              data={exercises}
+              keyExtractor={(item, index) => `exercise-${item.id}-${index}`}
+              renderItem={renderExerciseRow}
+              contentContainerStyle={[
+                styles.listContent,
+                { paddingBottom: selectedIds.length > 0 ? 120 : 40 },
+              ]}
+              onEndReachedThreshold={0.3}
+              onEndReached={() => {
+                if (
+                  !loadingMore &&
+                  hasMore &&
+                  !isSearchMode &&
+                  !hasActiveFilters
+                ) {
+                  loadExercises(false);
+                }
+              }}
+              ListFooterComponent={renderFooter}
+              keyboardShouldPersistTaps="handled"
+            />
+
+            {selectedIds.length > 0 && (
+              <View style={styles.bulkFooter} pointerEvents="box-none">
+                <TouchableOpacity
+                  style={styles.addSelectedButton}
+                  onPress={() => {
+                    const toAdd = exercises.filter((e) =>
+                      selectedIds.includes(e.id),
+                    );
+                    toAdd.forEach((ex) => addExerciseToWorkout(ex));
+                    router.back();
+                  }}
+                  activeOpacity={0.85}
+                >
+                  <Ionicons
+                    name="add-circle"
+                    size={20}
+                    color={theme.background.dark}
+                    style={{ marginRight: 8 }}
+                  />
+                  <Text style={styles.addSelectedText}>
+                    Add {selectedIds.length} selected
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            )}
+          </>
+        )}
+      </View>
+
+      {/* Filter Sheet Modal */}
+      <ExerciseFilterSheet
+        ref={filterSheetRef}
+        isExpanded={filterSheetOpen}
+        onClose={() => setFilterSheetOpen(false)}
+        activeTab={activeFilterTab}
+        onTabChange={setActiveFilterTab}
+        selectedBodyPart={selectedBodyPart}
+        onBodyPartChange={setSelectedBodyPart}
+        selectedEquipment={selectedEquipment}
+        onEquipmentChange={setSelectedEquipment}
+        selectedDifficulty={selectedDifficulty}
+        onDifficultyChange={setSelectedDifficulty}
+        bodyParts={bodyParts}
+        equipments={equipments}
+        hasActiveFilters={hasActiveFilters}
+        onClearAll={clearAllFilters}
+      />
+    </>
   );
 }
 
-// ─── Styles ───────────────────────────────────────────────────────────────────
-
 const createStyles = (theme: Theme) =>
   StyleSheet.create({
-    container: {
-      flex: 1,
-      backgroundColor: theme.background.dark,
-    },
+    container: { flex: 1, backgroundColor: theme.background.dark },
     header: {
       flexDirection: "row",
       alignItems: "center",
@@ -350,37 +522,62 @@ const createStyles = (theme: Theme) =>
       paddingHorizontal: 20,
       paddingBottom: 16,
     },
-    backButton: {
-      padding: 8,
-      borderRadius: 8,
-    },
-    title: {
-      fontSize: 20,
-      fontWeight: "700",
-      color: theme.foreground.white,
+    backButton: { padding: 8, borderRadius: 8 },
+    title: { fontSize: 20, fontWeight: "700", color: theme.foreground.white },
+    // Search row
+    searchRow: {
+      flexDirection: "row",
+      alignItems: "center",
+      marginHorizontal: 20,
+      marginBottom: 12,
+      gap: 10,
     },
     searchContainer: {
+      flex: 1,
+      height: 46, // match filter button height
       flexDirection: "row",
       alignItems: "center",
       backgroundColor: theme.background.darker,
       borderRadius: 12,
-      marginHorizontal: 20,
-      marginBottom: 16,
       paddingHorizontal: 12,
-      paddingVertical: 10,
+      paddingVertical: 0,
     },
-    searchIcon: {
-      marginRight: 8,
+    searchIcon: { marginRight: 8 },
+    searchInput: { flex: 1, color: theme.foreground.white, fontSize: 16 },
+    filterButton: {
+      width: 46,
+      height: 46,
+      borderRadius: 12,
+      backgroundColor: theme.background.darker,
+      alignItems: "center",
+      justifyContent: "center",
+      borderWidth: 1,
+      borderColor: "transparent",
     },
-    searchInput: {
-      flex: 1,
-      color: theme.foreground.white,
-      fontSize: 16,
+    filterButtonActive: {
+      backgroundColor: theme.primary.main,
+      borderColor: theme.primary.main,
     },
-    listContent: {
-      paddingHorizontal: 20,
-      paddingBottom: 40,
+    filterBadge: {
+      position: "absolute",
+      top: 6,
+      right: 6,
+      width: 18,
+      height: 18,
+      borderRadius: 9,
+      backgroundColor: theme.background.dark,
+      alignItems: "center",
+      justifyContent: "center",
+      borderWidth: 2,
+      borderColor: theme.primary.main,
     },
+    filterBadgeText: {
+      fontSize: 9,
+      fontWeight: "700",
+      color: theme.primary.main,
+    },
+    // Exercise list
+    listContent: { paddingHorizontal: 20, paddingBottom: 40 },
     exerciseRow: {
       flexDirection: "row",
       alignItems: "center",
@@ -390,41 +587,90 @@ const createStyles = (theme: Theme) =>
       gap: 12,
     },
     exerciseThumbnailContainer: {
-      width: 60,
-      height: 60,
+      position: "relative",
+      width: 64,
+      height: 64,
       borderRadius: 12,
       overflow: "hidden",
       backgroundColor: theme.background.darker,
     },
-    exerciseThumbnail: {
-      width: 60,
-      height: 60,
+    exerciseThumbnail: { width: 64, height: 64 },
+    selectedOverlay: {
+      position: "absolute",
+      top: 6,
+      right: 6,
+      zIndex: 3,
+    },
+    exerciseRowSelected: {
+      backgroundColor: theme.background.accent,
+    },
+    bulkFooter: {
+      position: "absolute",
+      left: 20,
+      right: 20,
+      bottom: 18,
+      alignItems: "center",
+    },
+    addSelectedButton: {
+      backgroundColor: theme.primary.main,
+      paddingVertical: 12,
+      paddingHorizontal: 20,
+      borderRadius: 12,
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "center",
+      shadowColor: "#000",
+      shadowOpacity: 0.12,
+      shadowRadius: 6,
+      elevation: 4,
+    },
+    addSelectedText: {
+      fontSize: 16,
+      fontWeight: "700",
+      color: theme.background.dark,
     },
     exerciseThumbnailPlaceholder: {
-      width: 60,
-      height: 60,
+      width: 64,
+      height: 64,
       alignItems: "center",
       justifyContent: "center",
       backgroundColor: theme.background.accent,
       borderRadius: 12,
     },
-    exerciseInfo: {
-      flex: 1,
-      gap: 2,
-    },
+    exerciseInfo: { flex: 1, gap: 3 },
     exerciseName: {
       fontSize: 15,
       fontWeight: "700",
       color: theme.foreground.white,
+      textTransform: "capitalize",
     },
     exerciseMeta: {
       fontSize: 12,
       color: theme.foreground.gray,
+      textTransform: "capitalize",
+    },
+    exerciseTagRow: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 6,
+      flexWrap: "wrap",
     },
     exerciseEquipment: {
       fontSize: 11,
       color: theme.primary.main,
       fontWeight: "600",
+      textTransform: "capitalize",
+    },
+    difficultyPill: {
+      paddingHorizontal: 7,
+      paddingVertical: 2,
+      borderRadius: 10,
+      borderWidth: 1,
+    },
+    difficultyPillText: {
+      fontSize: 10,
+      fontWeight: "700",
+      textTransform: "capitalize",
     },
     centered: {
       flex: 1,
@@ -432,8 +678,18 @@ const createStyles = (theme: Theme) =>
       justifyContent: "center",
       gap: 12,
     },
-    emptyText: {
-      fontSize: 16,
-      color: theme.foreground.gray,
+    emptyText: { fontSize: 16, color: theme.foreground.gray },
+    emptyResetButton: {
+      paddingHorizontal: 20,
+      paddingVertical: 10,
+      borderRadius: 20,
+      backgroundColor: theme.primary.main + "20",
+      borderWidth: 1,
+      borderColor: theme.primary.main,
+    },
+    emptyResetText: {
+      fontSize: 14,
+      color: theme.primary.main,
+      fontWeight: "600",
     },
   });

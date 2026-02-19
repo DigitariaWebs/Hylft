@@ -83,21 +83,23 @@ export const ActiveWorkoutProvider: React.FC<ActiveWorkoutProviderProps> = ({
   };
 
   const addExerciseToWorkout = (exercise: any) => {
-    if (!activeWorkout) return;
+    setActiveWorkout((prev) => {
+      if (!prev) return prev;
 
-    const entry: WorkoutExerciseEntry = {
-      id: `${Date.now()}-${Math.random()}`, // unique entry id
-      exerciseId: exercise.id,
-      name: exercise.name,
-      muscles: exercise.muscles || [],
-      equipment: exercise.equipment || [],
-      addedAt: Date.now(),
-    };
+      const entry: WorkoutExerciseEntry = {
+        id: `${Date.now()}-${Math.random()}`, // unique entry id
+        exerciseId: exercise.id,
+        name: exercise.name,
+        muscles: exercise.muscles || [],
+        equipment: exercise.equipment || [],
+        addedAt: Date.now(),
+      };
 
-    setActiveWorkout({
-      ...activeWorkout,
-      exercises: [...activeWorkout.exercises, entry],
-      sets: activeWorkout.sets + 1, // increment set count
+      return {
+        ...prev,
+        exercises: [...prev.exercises, entry],
+        sets: prev.sets + 1,
+      };
     });
   };
 
