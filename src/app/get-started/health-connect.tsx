@@ -1,7 +1,13 @@
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import React from "react";
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import {
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { Theme } from "../../constants/themes";
 import { useTheme } from "../../contexts/ThemeContext";
 
@@ -21,48 +27,75 @@ export default function HealthConnect() {
 
   return (
     <View style={styles.container}>
-      <View style={styles.content}>
-        <View style={styles.iconContainer}>
-          <MaterialCommunityIcons
-            name="heart-pulse"
-            size={80}
-            color={theme.primary.main}
-          />
-        </View>
-
-        <Text style={styles.title}>Connect Your Health Data</Text>
-        <Text style={styles.subtitle}>
-          Sync your fitness data automatically to track your progress and get
-          personalized insights
-        </Text>
-
-        <View style={styles.benefitsContainer}>
-          <View style={styles.benefitItem}>
-            <MaterialCommunityIcons
-              name="check-circle"
-              size={24}
-              color={theme.primary.main}
+      <ScrollView
+        style={{ flex: 1 }}
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+      >
+        <View style={styles.stepRow}>
+          <Text style={[styles.stepText, { color: theme.primary.main }]}>
+            STEP 8 OF 10
+          </Text>
+          <View style={styles.progressBar}>
+            <View
+              style={[
+                styles.progressFill,
+                {
+                  backgroundColor: theme.primary.main,
+                  width: `${(8 / 10) * 100}%`,
+                },
+              ]}
             />
-            <Text style={styles.benefitText}>Automatic activity tracking</Text>
-          </View>
-          <View style={styles.benefitItem}>
-            <MaterialCommunityIcons
-              name="check-circle"
-              size={24}
-              color={theme.primary.main}
-            />
-            <Text style={styles.benefitText}>Personalized recommendations</Text>
-          </View>
-          <View style={styles.benefitItem}>
-            <MaterialCommunityIcons
-              name="check-circle"
-              size={24}
-              color={theme.primary.main}
-            />
-            <Text style={styles.benefitText}>Better progress insights</Text>
           </View>
         </View>
-      </View>
+
+        <View style={styles.content}>
+          <View style={styles.iconContainer}>
+            <MaterialCommunityIcons
+              name="heart-pulse"
+              size={80}
+              color={theme.primary.main}
+            />
+          </View>
+
+          <Text style={styles.title}>Connect Your Health Data</Text>
+          <Text style={styles.subtitle}>
+            Sync your fitness data automatically to track your progress and get
+            personalized insights
+          </Text>
+
+          <View style={styles.benefitsContainer}>
+            <View style={styles.benefitItem}>
+              <MaterialCommunityIcons
+                name="check-circle"
+                size={24}
+                color={theme.primary.main}
+              />
+              <Text style={styles.benefitText}>
+                Automatic activity tracking
+              </Text>
+            </View>
+            <View style={styles.benefitItem}>
+              <MaterialCommunityIcons
+                name="check-circle"
+                size={24}
+                color={theme.primary.main}
+              />
+              <Text style={styles.benefitText}>
+                Personalized recommendations
+              </Text>
+            </View>
+            <View style={styles.benefitItem}>
+              <MaterialCommunityIcons
+                name="check-circle"
+                size={24}
+                color={theme.primary.main}
+              />
+              <Text style={styles.benefitText}>Better progress insights</Text>
+            </View>
+          </View>
+        </View>
+      </ScrollView>
 
       <View style={styles.buttonsContainer}>
         <TouchableOpacity
@@ -90,8 +123,30 @@ const createStyles = (theme: Theme) =>
     container: {
       flex: 1,
       backgroundColor: theme.background.dark,
-      paddingHorizontal: 32,
+      paddingHorizontal: 24,
       paddingBottom: 20,
+    },
+    scrollContent: {
+      paddingBottom: 20,
+    },
+    stepRow: {
+      marginBottom: 20,
+      marginTop: 8,
+    },
+    stepText: {
+      fontSize: 11,
+      fontWeight: "700",
+      letterSpacing: 1.2,
+      marginBottom: 8,
+    },
+    progressBar: {
+      height: 4,
+      borderRadius: 2,
+      backgroundColor: theme.background.accent,
+    },
+    progressFill: {
+      height: "100%",
+      borderRadius: 2,
     },
     content: {
       flex: 1,

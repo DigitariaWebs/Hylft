@@ -26,6 +26,25 @@ function createStyles(theme: Theme) {
       color: theme.foreground.gray,
       marginBottom: 50,
     },
+    stepRow: {
+      marginBottom: 20,
+      marginTop: 8,
+    },
+    stepText: {
+      fontSize: 11,
+      fontWeight: "700",
+      letterSpacing: 1.2,
+      marginBottom: 8,
+    },
+    progressBar: {
+      height: 4,
+      borderRadius: 2,
+      backgroundColor: theme.background.accent,
+    },
+    progressFill: {
+      height: "100%",
+      borderRadius: 2,
+    },
     optionsContainer: {
       gap: 16,
     },
@@ -76,7 +95,7 @@ export default function GenderSelection() {
     if (!selectedGender) return;
     // Save gender preference and set theme
     setTheme(selectedGender as "male" | "female");
-    router.navigate("/get-started/health-connect");
+    router.navigate("/get-started/fitness-goal");
   };
 
   const styles = createStyles(theme);
@@ -84,6 +103,23 @@ export default function GenderSelection() {
   return (
     <View style={styles.container}>
       <View style={styles.content}>
+        <View style={styles.stepRow}>
+          <Text style={[styles.stepText, { color: theme.primary.main }]}>
+            STEP 2 OF 10
+          </Text>
+          <View style={styles.progressBar}>
+            <View
+              style={[
+                styles.progressFill,
+                {
+                  backgroundColor: theme.primary.main,
+                  width: `${(2 / 10) * 100}%`,
+                },
+              ]}
+            />
+          </View>
+        </View>
+
         <Text style={styles.title}>What&apos;s your birth gender?</Text>
         <Text style={styles.subtitle}>
           This helps us provide personalized recommendations

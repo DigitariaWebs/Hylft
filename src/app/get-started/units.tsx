@@ -1,6 +1,12 @@
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import {
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { Theme } from "../../constants/themes";
 import { useTheme } from "../../contexts/ThemeContext";
 
@@ -72,7 +78,28 @@ export default function UnitsSelection() {
 
   return (
     <View style={styles.container}>
-      <View style={styles.content}>
+      <ScrollView
+        style={{ flex: 1 }}
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+      >
+        <View style={styles.stepRow}>
+          <Text style={[styles.stepText, { color: theme.primary.main }]}>
+            STEP 1 OF 10
+          </Text>
+          <View style={styles.progressBar}>
+            <View
+              style={[
+                styles.progressFill,
+                {
+                  backgroundColor: theme.primary.main,
+                  width: `${(1 / 10) * 100}%`,
+                },
+              ]}
+            />
+          </View>
+        </View>
+
         <Text style={styles.title}>Select Your Units</Text>
         <Text style={styles.subtitle}>
           Choose your preferred measurement units
@@ -98,7 +125,7 @@ export default function UnitsSelection() {
             setSelectedHeight,
           )}
         </View>
-      </View>
+      </ScrollView>
 
       <TouchableOpacity
         style={styles.continueButton}
@@ -116,8 +143,30 @@ function createStyles(theme: Theme) {
     container: {
       flex: 1,
       backgroundColor: theme.background.dark,
-      paddingHorizontal: 32,
+      paddingHorizontal: 24,
       paddingBottom: 20,
+    },
+    scrollContent: {
+      paddingBottom: 20,
+    },
+    stepRow: {
+      marginBottom: 20,
+      marginTop: 8,
+    },
+    stepText: {
+      fontSize: 11,
+      fontWeight: "700",
+      letterSpacing: 1.2,
+      marginBottom: 8,
+    },
+    progressBar: {
+      height: 4,
+      borderRadius: 2,
+      backgroundColor: theme.background.accent,
+    },
+    progressFill: {
+      height: "100%",
+      borderRadius: 2,
     },
     content: {
       flex: 1,

@@ -1,7 +1,13 @@
 import { MaterialIcons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import React from "react";
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import {
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { Theme } from "../../constants/themes";
 import { useTheme } from "../../contexts/ThemeContext";
 
@@ -22,49 +28,76 @@ export default function EmailPreferences() {
 
   return (
     <View style={styles.container}>
-      <View style={styles.content}>
-        <View style={styles.iconContainer}>
-          <MaterialIcons name="email" size={80} color={theme.primary.main} />
+      <ScrollView
+        style={{ flex: 1 }}
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+      >
+        <View style={styles.stepRow}>
+          <Text style={[styles.stepText, { color: theme.primary.main }]}>
+            STEP 9 OF 10
+          </Text>
+          <View style={styles.progressBar}>
+            <View
+              style={[
+                styles.progressFill,
+                {
+                  backgroundColor: theme.primary.main,
+                  width: `${(9 / 10) * 100}%`,
+                },
+              ]}
+            />
+          </View>
         </View>
 
-        <Text style={styles.title}>Can we send you emails?</Text>
-        <Text style={styles.promiseText}>
-          No spam, promise. We hate it too.
-        </Text>
+        <View style={styles.content}>
+          <View style={styles.iconContainer}>
+            <MaterialIcons name="email" size={80} color={theme.primary.main} />
+          </View>
 
-        <View style={styles.listContainer}>
-          <View style={styles.listItem}>
-            <MaterialIcons
-              name="lightbulb-outline"
-              size={24}
-              color={theme.primary.main}
-            />
-            <Text style={styles.listItemText}>
-              Tips for getting the most out of Hylift
-            </Text>
-          </View>
-          <View style={styles.listItem}>
-            <MaterialIcons
-              name="new-releases"
-              size={24}
-              color={theme.primary.main}
-            />
-            <Text style={styles.listItemText}>New feature announcements</Text>
-          </View>
-          <View style={styles.listItem}>
-            <MaterialIcons
-              name="local-offer"
-              size={24}
-              color={theme.primary.main}
-            />
-            <Text style={styles.listItemText}>Promotional offers</Text>
-          </View>
-          <View style={styles.listItem}>
-            <MaterialIcons name="logout" size={24} color={theme.primary.main} />
-            <Text style={styles.listItemText}>Opt out anytime</Text>
+          <Text style={styles.title}>Can we send you emails?</Text>
+          <Text style={styles.promiseText}>
+            No spam, promise. We hate it too.
+          </Text>
+
+          <View style={styles.listContainer}>
+            <View style={styles.listItem}>
+              <MaterialIcons
+                name="lightbulb-outline"
+                size={24}
+                color={theme.primary.main}
+              />
+              <Text style={styles.listItemText}>
+                Tips for getting the most out of Hylift
+              </Text>
+            </View>
+            <View style={styles.listItem}>
+              <MaterialIcons
+                name="new-releases"
+                size={24}
+                color={theme.primary.main}
+              />
+              <Text style={styles.listItemText}>New feature announcements</Text>
+            </View>
+            <View style={styles.listItem}>
+              <MaterialIcons
+                name="local-offer"
+                size={24}
+                color={theme.primary.main}
+              />
+              <Text style={styles.listItemText}>Promotional offers</Text>
+            </View>
+            <View style={styles.listItem}>
+              <MaterialIcons
+                name="logout"
+                size={24}
+                color={theme.primary.main}
+              />
+              <Text style={styles.listItemText}>Opt out anytime</Text>
+            </View>
           </View>
         </View>
-      </View>
+      </ScrollView>
 
       <View style={styles.buttonsContainer}>
         <TouchableOpacity
@@ -92,8 +125,30 @@ const createStyles = (theme: Theme) =>
     container: {
       flex: 1,
       backgroundColor: theme.background.dark,
-      paddingHorizontal: 32,
+      paddingHorizontal: 24,
       paddingBottom: 20,
+    },
+    scrollContent: {
+      paddingBottom: 20,
+    },
+    stepRow: {
+      marginBottom: 20,
+      marginTop: 8,
+    },
+    stepText: {
+      fontSize: 11,
+      fontWeight: "700",
+      letterSpacing: 1.2,
+      marginBottom: 8,
+    },
+    progressBar: {
+      height: 4,
+      borderRadius: 2,
+      backgroundColor: theme.background.accent,
+    },
+    progressFill: {
+      height: "100%",
+      borderRadius: 2,
     },
     content: {
       flex: 1,
