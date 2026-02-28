@@ -11,6 +11,7 @@ import {
   View,
   ViewToken,
 } from "react-native";
+import { useTranslation } from "react-i18next";
 import { Theme } from "../../constants/themes";
 import { useActiveWorkout } from "../../contexts/ActiveWorkoutContext";
 import { useTheme } from "../../contexts/ThemeContext";
@@ -34,14 +35,14 @@ function toISO(date: Date): string {
   return `${y}-${m}-${d}`;
 }
 
-function getDayLabel(offset: number): string {
-  if (offset === -1) return "YESTERDAY";
-  if (offset === 0) return "TODAY";
-  if (offset === 1) return "TOMORROW";
-  return "IN 2 DAYS";
+function getDayLabel(offset: number, t: (key: string) => string): string {
+  if (offset === -1) return t("schedule.yesterday");
+  if (offset === 0) return t("schedule.today");
+  if (offset === 1) return t("schedule.tomorrow");
+  return t("schedule.in2Days");
 }
 
-function buildSlides() {
+function buildSlides(t: (key: string) => string) {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
@@ -51,7 +52,7 @@ function buildSlides() {
     return {
       offset,
       date: toISO(d),
-      label: getDayLabel(offset),
+      label: getDayLabel(offset, t),
       dayName: d.toLocaleDateString("en-US", { weekday: "long" }),
       displayDate: d.toLocaleDateString("en-US", {
         month: "long",
@@ -82,7 +83,8 @@ function DayCard({
   isToday,
   onPress,
   onStartWorkout,
-}: DayCardProps) {
+  t,
+}: DayCardProps & { t: (key: string) => string }) {
   const isCompleted = schedDay?.status === "completed";
   const isRest = !schedDay || schedDay.status === "rest";
 
@@ -93,17 +95,17 @@ function DayCard({
       : "#4FC3F7";
 
   const statusBadge = isCompleted
-    ? { color: "#4CAF50", icon: "checkmark-circle" as const, text: "Completed" }
+    ? { color: "#4CAF50", icon: "checkmark-circle" as const, text: t("schedule.completed") }
     : isRest
       ? {
           color: theme.foreground.gray,
           icon: "moon-outline" as const,
-          text: "Rest Day",
+          text: t("schedule.restDay"),
         }
       : {
           color: theme.primary.main,
           icon: "time-outline" as const,
-          text: "Scheduled",
+          text: t("schedule.scheduled"),
         };
 
   return (
@@ -158,7 +160,7 @@ function DayCard({
 
           {isRest ? (
             /* ── REST DAY ── */
-            <RestDayContent theme={theme} notes={schedDay?.notes} />
+            <RestDayContent theme={theme} notes={schedDay?.notes} t={t} />
           ) : (
             /* ── WORKOUT ── */
             <WorkoutContent
@@ -166,6 +168,7 @@ function DayCard({
               schedDay={schedDay}
               theme={theme}
               isCompleted={isCompleted}
+              t={t}
             />
           )}
 
@@ -207,7 +210,7 @@ function DayCard({
                 <Text
                   style={[styles.detailBtnText, { color: theme.primary.main }]}
                 >
-                  View Plan
+                  {t("schedule.viewPlan")}
                 </Text>
               </TouchableOpacity>
             )}
@@ -223,7 +226,7 @@ function DayCard({
               >
                 <Ionicons name="play" size={16} color="#0B0D0E" />
                 <Text style={styles.startBtnText}>
-                  {slide.offset === 0 ? "Start Workout" : "Start Now"}
+                  {slide.offset === 0 ? t("schedule.startWorkout") : t("schedule.startNow")}
                 </Text>
               </TouchableOpacity>
             )}
@@ -236,7 +239,7 @@ function DayCard({
               >
                 <Ionicons name="trophy-outline" size={16} color="#fff" />
                 <Text style={[styles.startBtnText, { color: "#fff" }]}>
-                  View Summary
+                  {t("schedule.viewSummary")}
                 </Text>
               </TouchableOpacity>
             )}
@@ -261,7 +264,7 @@ function DayCard({
                     { color: theme.foreground.gray },
                   ]}
                 >
-                  Rest & Recover
+                  {t("schedule.restAndRecover")}
                 </Text>
               </TouchableOpacity>
             )}
@@ -272,7 +275,7 @@ function DayCard({
   );
 }
 
-function RestDayContent({ theme, notes }: { theme: Theme; notes?: string }) {
+function RestDayContent({ theme, notes, t }: { theme: Theme; notes?: string; t: (key: string) => string }) {
   return (
     <View style={styles.restContent}>
       <View
@@ -284,14 +287,13 @@ function RestDayContent({ theme, notes }: { theme: Theme; notes?: string }) {
         <Ionicons name="moon" size={32} color={theme.foreground.gray} />
       </View>
       <Text style={[styles.restTitle, { color: theme.foreground.white }]}>
-        Rest Day
+        {t("schedule.restDay")}
       </Text>
       <Text style={[styles.restSubtitle, { color: theme.foreground.gray }]}>
-        Recovery is part of the process. Let your muscles rebuild and grow
-        stronger.
+        {t("schedule.recoveryIsPart")}
       </Text>
       <View style={styles.restTips}>
-        {["Stay hydrated 💧", "Get 8h of sleep 😴", "Light stretching 🧘"].map(
+        {[t("schedule.stayHydrated"), t("schedule.get8hSleep"), t("schedule.lightStretching")].map(
           (tip) => (
             <View
               key={tip}
@@ -318,17 +320,19 @@ function WorkoutContent({
   schedDay,
   theme,
   isCompleted,
+  t,
 }: {
   routine: Routine | undefined;
   schedDay: ScheduledDay | undefined;
   theme: Theme;
   isCompleted: boolean;
+  t: (key: string) => string;
 }) {
   if (!routine) {
     return (
       <View style={styles.noRoutineBox}>
         <Text style={[styles.noRoutineText, { color: theme.foreground.gray }]}>
-          No routine assigned
+          {t("schedule.noRoutineAssigned")}
         </Text>
       </View>
     );
@@ -384,7 +388,7 @@ function WorkoutContent({
         <StatItem
           icon="barbell-outline"
           value={String(routine.exercises.length)}
-          label="Exercises"
+          label={t("schedule.exercises")}
           theme={theme}
         />
         <View
@@ -396,7 +400,7 @@ function WorkoutContent({
         <StatItem
           icon="layers-outline"
           value={String(totalSets)}
-          label="Total Sets"
+          label={t("schedule.totalSets")}
           theme={theme}
         />
         <View
@@ -408,7 +412,7 @@ function WorkoutContent({
         <StatItem
           icon="time-outline"
           value={`${routine.estimatedDuration}m`}
-          label="Est. Time"
+          label={t("schedule.estTime")}
           theme={theme}
         />
       </View>
@@ -436,7 +440,7 @@ function WorkoutContent({
 
       {/* Exercise Preview List */}
       <Text style={[styles.exercisesHeader, { color: theme.foreground.gray }]}>
-        EXERCISES
+        {t("schedule.exercises").toUpperCase()}
       </Text>
       {routine.exercises.slice(0, 5).map((ex, idx) => (
         <View
@@ -482,7 +486,7 @@ function WorkoutContent({
       ))}
       {routine.exercises.length > 5 && (
         <Text style={[styles.moreExercises, { color: theme.foreground.gray }]}>
-          +{routine.exercises.length - 5} more exercises
+          +{routine.exercises.length - 5} {t("schedule.moreExercises")}
         </Text>
       )}
     </View>
@@ -516,12 +520,13 @@ function StatItem({
 // ─── Main Screen ─────────────────────────────────────────────────────────────
 
 export default function Schedule() {
+  const { t } = useTranslation();
   const { theme } = useTheme();
   const router = useRouter();
   const { startWorkout } = useActiveWorkout();
   const flatListRef = useRef<FlatList>(null);
 
-  const slides = buildSlides(); // always fresh
+  const slides = buildSlides(t); // always fresh
   const todayIndex = 1; // index 1 → offset 0 = "today"
 
   const [activeIndex, setActiveIndex] = useState(todayIndex);
@@ -624,7 +629,7 @@ export default function Schedule() {
       >
         <View>
           <Text style={[styles.headerTitle, { color: theme.foreground.white }]}>
-            My Schedule
+            {t("schedule.mySchedule")}
           </Text>
           <Text style={[styles.headerSub, { color: theme.foreground.gray }]}>
             {new Date().toLocaleDateString("en-US", {
@@ -715,6 +720,7 @@ export default function Schedule() {
               isToday={item.offset === 0}
               onPress={() => handleNavigateToDetail(item.date)}
               onStartWorkout={() => handleStartWorkout(item)}
+              t={t}
             />
           );
         }}

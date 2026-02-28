@@ -1,6 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
 import React, { memo } from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { useTranslation } from "react-i18next";
 import { useTheme } from "../../contexts/ThemeContext";
 import { Workout } from "../../data/mockData";
 
@@ -18,6 +19,7 @@ const WorkoutCard = ({
   onStart,
   fullWidth = false,
 }: Props) => {
+  const { t } = useTranslation();
   const { theme } = useTheme();
   const styles = createStyles(theme);
 
@@ -52,11 +54,11 @@ const WorkoutCard = ({
       <View style={styles.statsRow}>
         <View style={styles.statItem}>
           <Text style={styles.statValue}>{workout.exercises.length}</Text>
-          <Text style={styles.statLabel}>Exercises</Text>
+          <Text style={styles.statLabel}>{t("schedule.exercises")}</Text>
         </View>
         <View style={styles.statItem}>
           <Text style={styles.statValue}>{setsCount}</Text>
-          <Text style={styles.statLabel}>Sets</Text>
+          <Text style={styles.statLabel}>{t("post.sets")}</Text>
         </View>
       </View>
 
@@ -81,7 +83,7 @@ const WorkoutCard = ({
         activeOpacity={0.85}
         style={styles.startButton}
       >
-        <Text style={styles.startButtonText}>Start Workout</Text>
+        <Text style={styles.startButtonText}>{t("schedule.startWorkout")}</Text>
         <Ionicons name="arrow-forward" size={14} color={"#111"} />
       </TouchableOpacity>
     </TouchableOpacity>

@@ -5,6 +5,7 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import { ActiveWorkoutProvider } from "../contexts/ActiveWorkoutContext";
 import { CreateRoutineProvider } from "../contexts/CreateRoutineContext";
+import { I18nProvider } from "../contexts/I18nContext";
 import { ThemeProvider } from "../contexts/ThemeContext";
 
 SplashScreen.preventAutoHideAsync();
@@ -13,9 +14,10 @@ export default function RootLayout() {
   return (
     <View style={{ flex: 1 }} onLayout={() => SplashScreen.hideAsync()}>
       <GestureHandlerRootView style={{ flex: 1 }}>
-        <ThemeProvider>
-          <ActiveWorkoutProvider>
-            <CreateRoutineProvider>
+        <I18nProvider>
+          <ThemeProvider>
+            <ActiveWorkoutProvider>
+              <CreateRoutineProvider>
               <SafeAreaProvider>
                 <SafeAreaView style={{ flex: 1, backgroundColor: "#0B0D0E" }}>
                   <Stack
@@ -49,6 +51,7 @@ export default function RootLayout() {
             </CreateRoutineProvider>
           </ActiveWorkoutProvider>
         </ThemeProvider>
+        </I18nProvider>
       </GestureHandlerRootView>
     </View>
   );
