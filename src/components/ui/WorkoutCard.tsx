@@ -3,6 +3,7 @@ import React, { memo } from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { useTranslation } from "react-i18next";
 import { useTheme } from "../../contexts/ThemeContext";
+import { formatShortDate } from "../../utils/dateFormatter";
 import { Workout } from "../../data/mockData";
 
 type Props = {
@@ -28,11 +29,7 @@ const WorkoutCard = ({
     0,
   );
 
-  const formattedDate = new Date(workout.date).toLocaleDateString(undefined, {
-    weekday: "short",
-    month: "short",
-    day: "numeric",
-  });
+  const formattedDate = formatShortDate(workout.date);
 
   return (
     <TouchableOpacity

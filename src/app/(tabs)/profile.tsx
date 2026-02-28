@@ -12,6 +12,7 @@ import {
 import { useTranslation } from "react-i18next";
 import { Theme } from "../../constants/themes";
 import { useTheme } from "../../contexts/ThemeContext";
+import { translateRoutineName } from "../../utils/exerciseTranslator";
 import {
   getPostsByUserId,
   getRoutinesByUserId,
@@ -331,7 +332,7 @@ function calcTotalVolume(workouts: Workout[]): string {
 // ─── Component ───────────────────────────────────────────────────────────────
 
 export default function Profile() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { theme } = useTheme();
   const router = useRouter();
   const styles = createStyles(theme);
@@ -444,7 +445,9 @@ export default function Profile() {
               {/* name + difficulty */}
               <View style={styles.routineHeader}>
                 <View style={styles.routineInfo}>
-                  <Text style={styles.routineName}>{routine.name}</Text>
+                  <Text style={styles.routineName}>
+                    {i18n.language === "fr" ? translateRoutineName(routine.name) : routine.name}
+                  </Text>
                   <Text style={styles.routineDesc} numberOfLines={2}>
                     {routine.description}
                   </Text>

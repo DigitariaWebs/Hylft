@@ -42,20 +42,30 @@ export const saveLanguage = async (language: string): Promise<void> => {
 export const initI18n = async (): Promise<string> => {
   const language = await getSavedLanguage();
 
-  i18n
-    .use(initReactI18next)
-    .init({
-      compatibilityJSON: "v3",
-      resources: {
-        en: { translation: en },
-        fr: { translation: fr },
-      },
-      lng: language,
-      fallbackLng: "en",
-      interpolation: {
-        escapeValue: false,
-      },
-    });
+  // Only initialize if not already initialized
+  if (!i18n.isInitialized) {
+    // Wait for i18n to be initialized
+    await i18n
+      .use(initReactI18next)
+      .init({
+        compatibilityJSON: "v3",
+        resources: {
+          en: { translation: en },
+          fr: { translation: fr },
+        },
+        lng: language,
+        fallbackLng: "en",
+        interpolation: {
+          escapeValue: false,
+        },
+        react: {
+          useSuspense: false,
+        },
+      });
+  } else {
+    // If already initialized, just change the language
+    await i18n.changeLanguage(language);
+  }
 
   return language;
 };

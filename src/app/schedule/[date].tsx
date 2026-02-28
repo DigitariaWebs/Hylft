@@ -13,6 +13,8 @@ import { useTranslation } from "react-i18next";
 import { Theme } from "../../constants/themes";
 import { useActiveWorkout } from "../../contexts/ActiveWorkoutContext";
 import { useTheme } from "../../contexts/ThemeContext";
+import { formatDate, formatWeekday } from "../../utils/dateFormatter";
+import { translateRoutineName } from "../../utils/exerciseTranslator";
 import {
   getRoutineById,
   getScheduleForDate,
@@ -23,16 +25,6 @@ import {
 } from "../../data/mockData";
 
 const MY_USER_ID = "1";
-
-function formatDate(dateStr: string): string {
-  const d = new Date(dateStr + "T00:00:00");
-  return d.toLocaleDateString("en-US", {
-    weekday: "long",
-    month: "long",
-    day: "numeric",
-    year: "numeric",
-  });
-}
 
 function getDayLabel(dateStr: string, t: (key: string) => string): string {
   const today = new Date();
@@ -45,7 +37,7 @@ function getDayLabel(dateStr: string, t: (key: string) => string): string {
   if (diff === 0) return t("scheduleDetail.today");
   if (diff === 1) return t("scheduleDetail.tomorrow");
   if (diff === 2) return t("scheduleDetail.in2Days");
-  return d.toLocaleDateString("en-US", { weekday: "long" });
+  return formatWeekday(dateStr);
 }
 
 function formatRestTime(seconds: number, t: (key: string) => string): string {
@@ -223,7 +215,7 @@ function ExerciseRow({
 // ─── Main Screen ─────────────────────────────────────────────────────────────
 
 export default function ScheduleDetailPage() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { date } = useLocalSearchParams<{ date: string }>();
   const router = useRouter();
   const { theme } = useTheme();
@@ -509,7 +501,7 @@ export default function ScheduleDetailPage() {
                       { color: theme.foreground.white },
                     ]}
                   >
-                    {routine.name}
+                    {i18n.language === "fr" ? translateRoutineName(routine.name) : routine.name}
                   </Text>
                   <Text
                     style={[

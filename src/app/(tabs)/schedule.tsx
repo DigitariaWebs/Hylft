@@ -15,6 +15,8 @@ import { useTranslation } from "react-i18next";
 import { Theme } from "../../constants/themes";
 import { useActiveWorkout } from "../../contexts/ActiveWorkoutContext";
 import { useTheme } from "../../contexts/ThemeContext";
+import { formatDisplayDate, formatWeekday } from "../../utils/dateFormatter";
+import { translateRoutineName } from "../../utils/exerciseTranslator";
 import {
   addScheduleListener,
   getRoutineById,
@@ -53,12 +55,8 @@ function buildSlides(t: (key: string) => string) {
       offset,
       date: toISO(d),
       label: getDayLabel(offset, t),
-      dayName: d.toLocaleDateString("en-US", { weekday: "long" }),
-      displayDate: d.toLocaleDateString("en-US", {
-        month: "long",
-        day: "numeric",
-        year: "numeric",
-      }),
+      dayName: formatWeekday(d),
+      displayDate: formatDisplayDate(d),
     };
   });
 }
@@ -328,6 +326,10 @@ function WorkoutContent({
   isCompleted: boolean;
   t: (key: string) => string;
 }) {
+  const { i18n } = useTranslation();
+  const getTranslatedName = (name: string) => {
+    return i18n.language === "fr" ? translateRoutineName(name) : name;
+  };
   if (!routine) {
     return (
       <View style={styles.noRoutineBox}>
@@ -356,7 +358,7 @@ function WorkoutContent({
             style={[styles.workoutName, { color: theme.foreground.white }]}
             numberOfLines={1}
           >
-            {routine.name}
+            {getTranslatedName(routine.name)}
           </Text>
           <Text
             style={[styles.workoutDesc, { color: theme.foreground.gray }]}
@@ -632,11 +634,7 @@ export default function Schedule() {
             {t("schedule.mySchedule")}
           </Text>
           <Text style={[styles.headerSub, { color: theme.foreground.gray }]}>
-            {new Date().toLocaleDateString("en-US", {
-              weekday: "long",
-              month: "long",
-              day: "numeric",
-            })}
+            {formatDisplayDate(new Date(), { weekday: "long", month: "long", day: "numeric" })}
           </Text>
         </View>
         <TouchableOpacity
@@ -673,7 +671,7 @@ export default function Schedule() {
             style={[styles.summaryText, { color: theme.foreground.white }]}
             numberOfLines={1}
           >
-            Today:{" "}
+            {t("schedule.today")}:{" "}
             <Text style={{ color: theme.primary.main }}>
               {todayRoutine.name}
             </Text>
